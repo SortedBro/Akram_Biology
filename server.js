@@ -5,6 +5,8 @@ const flash          = require('connect-flash');
 const methodOverride = require('method-override');
 const path           = require('path');
 const connectDB      = require('./config/db');
+const MongoStore = require('connect-mongo');
+
 
 const app = express();
 
@@ -33,6 +35,18 @@ app.use((req, res, next) => {
   res.locals.session = req.session;
   next();
 });
+// Upar add karo
+
+// Session wali line replace karo
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'akram_biology_secret',
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI
+  }),
+  cookie: { maxAge: 1000 * 60 * 60 * 24 }
+}));
 
 // ─── ROUTES ───────────────────────────────────────────────────
 app.use('/',       require('./routes/public'));
