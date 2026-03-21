@@ -45,6 +45,7 @@ router.get('/dashboard', isAdmin, async (req, res) => {
     ]);
     const recentStudents = await Student.find().sort({ createdAt: -1 }).limit(5).lean();
     res.render('admin/dashboard', {
+      page: 'dashboard',
       title: 'Dashboard — Akram Biology Admin',
       adminName: req.session.adminName,
       stats: { totalStudents, pending, confirmed, unreadMessages },
@@ -72,6 +73,7 @@ router.get('/students', isAdmin, async (req, res) => {
     ];
     const students = await Student.find(filter).sort({ createdAt: -1 }).lean();
     res.render('admin/students', {
+      page: 'students',
       title: 'Students — Akram Biology Admin',
       adminName: req.session.adminName,
       students,
@@ -92,6 +94,7 @@ router.get('/students/:id', isAdmin, async (req, res) => {
     if (!student) { req.flash('error', 'Student not found'); return res.redirect('/admin/students'); }
     const batches = await Batch.find({ isActive: true }).lean();
     res.render('admin/student-detail', {
+      page: 'students',
       title: `${student.studentName} — Admin`,
       adminName: req.session.adminName,
       student, batches,
@@ -139,6 +142,7 @@ router.get('/batches', isAdmin, async (req, res) => {
   try {
     const batches = await Batch.find().lean();
     res.render('admin/batches', {
+      page: 'batches',
       title: 'Batches — Akram Biology Admin',
       adminName: req.session.adminName,
       batches,
@@ -184,6 +188,7 @@ router.get('/messages', isAdmin, async (req, res) => {
   const messages = await Contact.find().sort({ createdAt: -1 }).lean();
   await Contact.updateMany({ isRead: false }, { isRead: true });
   res.render('admin/messages', {
+      page: 'messages',
     title: 'Messages — Admin',
     adminName: req.session.adminName,
     messages,

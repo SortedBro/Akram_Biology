@@ -13,16 +13,16 @@
   <aside class="sidebar">
     <div class="sidebar-brand"><span>🧬</span> Akram Bio</div>
     <nav class="sidebar-nav">
-      <a href="/admin/dashboard" class="nav-item <%= page==='dashboard' ? 'active' : '' %>">
+      <a href="/admin/dashboard" class="nav-item <%= (locals.page==='dashboard') ? 'active' : '' %>">
         <span class="nav-icon">📊</span> Dashboard
       </a>
-      <a href="/admin/students" class="nav-item <%= page==='students' ? 'active' : '' %>">
+      <a href="/admin/students" class="nav-item <%= (locals.page==='students') ? 'active' : '' %>">
         <span class="nav-icon">👨‍🎓</span> Students
       </a>
-      <a href="/admin/batches" class="nav-item <%= page==='batches' ? 'active' : '' %>">
+      <a href="/admin/batches" class="nav-item <%= (locals.page==='batches') ? 'active' : '' %>">
         <span class="nav-icon">📅</span> Batches
       </a>
-      <a href="/admin/messages" class="nav-item <%= page==='messages' ? 'active' : '' %>">
+      <a href="/admin/messages" class="nav-item <%= (locals.page==='messages') ? 'active' : '' %>">
         <span class="nav-icon">💬</span> Messages
       </a>
       <div style="flex:1"></div>
