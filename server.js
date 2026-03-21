@@ -1,12 +1,11 @@
 require('dotenv').config();
 const express        = require('express');
 const session        = require('express-session');
+const MongoStore     = require('connect-mongo');
 const flash          = require('connect-flash');
 const methodOverride = require('method-override');
 const path           = require('path');
 const connectDB      = require('./config/db');
-const MongoStore = require('connect-mongo');
-
 
 const app = express();
 
@@ -22,39 +21,29 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride('_method'));
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'akram_biology_secret',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { maxAge: 1000 * 60 * 60 * 24 } // 1 day
-}));
-app.use(flash());
 
-// Make flash + session available in all views
-app.use((req, res, next) => {
-  res.locals.session = req.session;
-  next();
-});
-// Upar add karo
-
-// Session wali line replace karo
 app.use(session({
   secret: process.env.SESSION_SECRET || 'akram_biology_secret',
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
-    mongoUrl: process.env.MONGODB_URI
+    mongoUrl: process.env.MONGODB_URI || 'mongodb://localhost:27017/akram_biology',
+    ttl: 60 * 60 * 24  // 1 day
   }),
   cookie: { maxAge: 1000 * 60 * 60 * 24 }
 }));
 
+app.use(flash());
+
+// Flash + session available in all views
+app.use((req, res, next) => {
+  res.locals.session = req.session;
+  next();
+});
+
 // ─── ROUTES ───────────────────────────────────────────────────
-app.use('/',       require('./routes/public'));
-app.use('/admin',  require('./routes/admin'));
-// server alive 
-app.get('/alive',(req,res)=>{
-  res.json({m:"ok"})
-})
+app.use('/',      require('./routes/public'));
+app.use('/admin', require('./routes/admin'));
 
 // ─── 404 ─────────────────────────────────────────────────────
 app.use((req, res) => {
