@@ -1,0 +1,272 @@
+<%- include('partials/head') %>
+<%- include('partials/navbar') %>
+
+<!-- BG Canvas -->
+<canvas id="bio-canvas" style="position:fixed;inset:0;z-index:0;opacity:0.3;pointer-events:none"></canvas>
+
+<!-- ═══ HERO ═══════════════════════════════════════ -->
+<div class="hero" style="position:relative;z-index:1">
+  <div class="hero-ring" style="width:480px;height:480px"></div>
+  <div class="hero-ring" style="width:720px;height:720px;animation-delay:2s"></div>
+  <div class="hero-ring" style="width:960px;height:960px;animation-delay:4s"></div>
+
+  <div class="hero-eyebrow">
+    <span class="pulse-dot"></span>
+    Offline Tuition · Lohapur, West Bengal
+  </div>
+
+  <h1 class="hero-title">
+    <span class="grad">Akram Biology</span>
+    <span class="italic">Where Life Sciences Come Alive</span>
+  </h1>
+
+  <p class="hero-desc">
+    Expert coaching by <strong>Akram Sir</strong> — master every chapter
+    from Cell Biology to Ecology. Built for
+    <strong>Class 9–12 &amp; NEET</strong> aspirants.
+  </p>
+
+  <% if (success && success.length) { %>
+    <div class="alert alert-success" style="max-width:480px;margin-bottom:20px"><%= success[0] %></div>
+  <% } %>
+  <% if (error && error.length) { %>
+    <div class="alert alert-error" style="max-width:480px;margin-bottom:20px"><%= error[0] %></div>
+  <% } %>
+
+  <div class="hero-ctas">
+    <a href="/enroll" class="btn-primary">🌱 Enroll Today</a>
+    <a href="#topics"  class="btn-outline">Explore Topics →</a>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat-box"><div class="stat-num">500+</div><div class="stat-lbl">Students Taught</div></div>
+    <div class="stat-box"><div class="stat-num">10+</div><div class="stat-lbl">Years Experience</div></div>
+    <div class="stat-box"><div class="stat-num">98%</div><div class="stat-lbl">Board Pass Rate</div></div>
+    <div class="stat-box"><div class="stat-num">4.9★</div><div class="stat-lbl">Student Rating</div></div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══ ABOUT ══════════════════════════════════════ -->
+<section class="section reveal" id="about" style="position:relative;z-index:1">
+  <div class="about-grid">
+    <div class="teacher-card">
+      <div class="dna-icon">🧬</div>
+      <div class="teacher-name">Akram Sir</div>
+      <div class="teacher-role">Biology Expert · Educator</div>
+      <p class="teacher-bio">
+        With over a decade of teaching Biology, Akram Sir has guided hundreds of students to crack NEET,
+        secure top board marks, and fall in love with life sciences. His teaching blends deep conceptual
+        clarity with sharp exam strategies — making complex topics feel effortless.
+      </p>
+      <div class="tags">
+        <span class="tag">Cell Biology</span>
+        <span class="tag">Genetics</span>
+        <span class="tag">Ecology</span>
+        <span class="tag">Physiology</span>
+        <span class="tag">Evolution</span>
+        <span class="tag">Biotechnology</span>
+      </div>
+    </div>
+    <div>
+      <div class="sec-label">Why Akram Biology?</div>
+      <h2 class="sec-title">Offline Tuition That Actually Works</h2>
+      <p style="color:var(--muted);font-size:0.95rem;line-height:1.8;font-weight:300;margin-bottom:0">
+        In-person learning creates the kind of deep understanding no app can replicate.
+        With small batch sizes and personalised attention, every student gets exactly the guidance they need.
+      </p>
+      <div class="perk-list">
+        <div class="perk">
+          <div class="perk-dot"></div>
+          <div class="perk-body"><strong>Small Batches, Big Results</strong><span>Maximum 20 to 30 students per batch for focused attention</span></div>
+        </div>
+        <div class="perk">
+          <div class="perk-dot"></div>
+          <div class="perk-body"><strong>Chapter-wise Study Material</strong><span>Handcrafted notes, diagrams, and question banks</span></div>
+        </div>
+        <div class="perk">
+          <div class="perk-dot"></div>
+          <div class="perk-body"><strong>Regular Mock Tests</strong><span>NEET-pattern tests with detailed solutions every month</span></div>
+        </div>
+        <div class="perk">
+          <div class="perk-dot"></div>
+          <div class="perk-body"><strong>WhatsApp Doubt Support</strong><span>Ask doubts anytime — Akram Sir replies personally</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ═══ TOPICS ═════════════════════════════════════ -->
+<section class="section reveal" id="topics" style="position:relative;z-index:1">
+  <div class="sec-center">
+    <div class="sec-label">Curriculum</div>
+    <h2 class="sec-title">Biology Topics We Cover</h2>
+    <p class="sec-sub">Complete NCERT syllabus + NEET extras — taught with clarity, diagrams, and real exam focus.</p>
+  </div>
+  <div class="topics-grid">
+    <% const topics = [
+      {e:'🔬', t:'Cell Biology & Division',     d:'Prokaryotic/eukaryotic cells, mitosis, meiosis, cell cycle — the unit of life.',      tag:'NCERT Ch. 8–10'},
+      {e:'🧬', t:'Genetics & Molecular Biology', d:"Mendel's laws, DNA replication, transcription, translation — the blueprint of life.",  tag:'NCERT Ch. 5–6'},
+      {e:'🌿', t:'Plant Physiology',             d:'Photosynthesis, respiration, growth hormones, mineral nutrition and water transport.', tag:'NCERT Ch. 13–17'},
+      {e:'❤️',  t:'Human Physiology',            d:'Digestive, circulatory, nervous, endocrine, excretory systems in full depth.',        tag:'NCERT Ch. 16–22'},
+      {e:'🦎', t:'Diversity of Living Organisms',d:'Five kingdom classification, plant and animal kingdoms, taxonomy concepts.',           tag:'NCERT Ch. 1–4'},
+      {e:'🌍', t:'Ecology & Environment',        d:'Ecosystems, biodiversity, population, environmental issues — high NEET weightage.',    tag:'NCERT Ch. 13–16'},
+      {e:'🔄', t:'Reproduction & Development',   d:'Sexual and asexual reproduction, human reproductive system, embryology.',             tag:'NCERT Ch. 1–4'},
+      {e:'🧪', t:'Biotechnology',                d:'Recombinant DNA, GMOs, PCR, ELISA, cloning — modern biology techniques.',             tag:'NCERT Ch. 11–12'}
+    ]; %>
+    <% topics.forEach(function(t){ %>
+    <div class="topic-card">
+      <span class="topic-emoji"><%= t.e %></span>
+      <div class="topic-title"><%= t.t %></div>
+      <div class="topic-desc"><%= t.d %></div>
+      <div class="topic-tag"><%= t.tag %></div>
+    </div>
+    <% }); %>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ═══ SCHEDULE ══════════════════════════════════ -->
+<section class="section reveal" id="schedule" style="position:relative;z-index:1">
+  <div class="sec-label">Batches</div>
+  <h2 class="sec-title">Class Schedule &amp; Fees</h2>
+  <p class="sec-sub">Choose a batch that fits your timing. Seats are limited — enroll early.</p>
+
+  <div class="schedule-grid">
+    <% if (batches && batches.length) { %>
+      <% batches.forEach(function(b){ %>
+      <div class="batch-card">
+        <div class="batch-header">
+          <div class="batch-name"><%= b.name %></div>
+          <div class="batch-badge <%= b.currentStudents >= b.maxStudents ? 'full' : '' %>">
+            <%= b.currentStudents >= b.maxStudents ? 'FULL' : `${b.maxStudents - b.currentStudents} Seats Left` %>
+          </div>
+        </div>
+        <div class="batch-body">
+          <% b.days.forEach(function(day){ %>
+          <div class="sched-row">
+            <span class="sched-day"><%= day %></span>
+            <span class="sched-time"><%= b.time %></span>
+          </div>
+          <% }); %>
+          <div class="sched-row" style="margin-top:8px">
+            <span style="font-size:0.82rem;color:var(--muted)">Monthly Fee</span>
+            <span class="sched-fee">₹<%= b.fee %>/month</span>
+          </div>
+          <% if(b.description){ %>
+          <p style="font-size:0.8rem;color:var(--muted);margin-top:12px;line-height:1.6"><%= b.description %></p>
+          <% } %>
+          <a href="/enroll" style="display:block;margin-top:16px" class="btn-primary" style="text-align:center">Enroll in This Batch →</a>
+        </div>
+      </div>
+      <% }); %>
+    <% } else { %>
+      <p style="color:var(--muted)">Batches loading soon. Please contact Akram Sir directly.</p>
+    <% } %>
+
+    <div class="info-card">
+      <div class="info-row">
+        <div class="info-icon">📍</div>
+        <div class="info-body"><strong>Location</strong><span>Akram Biology Tuition Centre<br>Lohapur Bazar, Birbhum, West Bengal — 731237</span></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon">📚</div>
+        <div class="info-body"><strong>What's Included</strong><span>Study notes · Diagram sheets · Monthly tests · Doubt sessions · WhatsApp support</span></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon">🆓</div>
+        <div class="info-body"><strong>Free Demo Class</strong><span>Attend one free class before enrolling. No pressure, no obligation.</span></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon">📞</div>
+        <div class="info-body"><strong>Call / WhatsApp</strong><span>+91 9609353839<br>Akram Sir replies personally</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ═══ TESTIMONIALS ═══════════════════════════════ -->
+<section class="section reveal" style="position:relative;z-index:1">
+  <div class="sec-center">
+    <div class="sec-label">Student Stories</div>
+    <h2 class="sec-title">What Our Students Say</h2>
+  </div>
+  <div class="testi-grid">
+    <div class="testi-card">
+      <div class="stars">★★★★★</div>
+      <p class="testi-text">"Akram Sir made genetics feel like storytelling. I went from failing to scoring 87% in Biology boards. His diagrams and mnemonics are unforgettable."</p>
+      <div class="testi-author">
+        <div class="testi-avatar" style="background:linear-gradient(135deg,#166534,#22c55e)">RS</div>
+        <div><div class="testi-name">Riya Sharma</div><div class="testi-class">Class 12 · WBCHSE 2024</div></div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="stars">★★★★★</div>
+      <p class="testi-text">"Best biology teacher in Logapur, no doubt. The NEET mock tests he gives are harder than the actual exam — so I was totally ready on test day."</p>
+      <div class="testi-author">
+        <div class="testi-avatar" style="background:linear-gradient(135deg,#0f766e,#2dd4bf)">MK</div>
+        <div><div class="testi-name">Mehdi Khan</div><div class="testi-class">NEET 2024 · AIR 14,820</div></div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="stars">★★★★★</div>
+      <p class="testi-text">"The small batch size means sir knows every student personally. It feels like having a private tutor. I joined in Class 11 and stayed through NEET."</p>
+      <div class="testi-author">
+        <div class="testi-avatar" style="background:linear-gradient(135deg,#854d0e,#a3e635)">PD</div>
+        <div><div class="testi-name">Priya Das</div><div class="testi-class">NEET 2023 · 580/720</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ═══ CONTACT ════════════════════════════════════ -->
+<section class="section reveal" id="contact" style="position:relative;z-index:1">
+  <div class="sec-label">Get In Touch</div>
+  <h2 class="sec-title">Contact Akram Sir</h2>
+  <div class="contact-grid">
+    <div class="contact-info">
+      <div class="contact-card">
+        <div class="contact-icon">📍</div>
+        <div class="contact-body"><strong>Address</strong><span>Lohapur Bazar, Birbhum<br>West Bengal — 731237</span></div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-icon">📞</div>
+        <div class="contact-body"><strong>Phone / WhatsApp</strong><span>+91 9609353839<br>Available 9AM – 8PM daily</span></div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-icon">✉️</div>
+        <div class="contact-body"><strong>Email</strong><span>akrambiology@gmail.com</span></div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-icon">🕐</div>
+        <div class="contact-body"><strong>Office Hours</strong><span>Mon–Sat: 9:00 AM – 8:00 PM<br>Sunday: 9:00 AM – 2:00 PM</span></div>
+      </div>
+    </div>
+    <div class="contact-form">
+      <h3 style="font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:20px">Send a Message</h3>
+      <form action="/contact" method="POST" class="form-stack">
+        <div class="fg"><label>Your Name</label><input type="text" name="name" placeholder="Rohit Sharma" required></div>
+        <div class="fg"><label>WhatsApp Number</label><input type="tel" name="phone" placeholder="+91 98765 43210" required></div>
+        <div class="fg"><label>Message</label><textarea name="message" rows="4" placeholder="Ask about batches, fees, topics..." required></textarea></div>
+        <button type="submit" class="form-btn">Send Message 🌿</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Reveal animation -->
+<style>
+.reveal{opacity:0;transform:translateY(28px);transition:all 0.75s ease}
+.reveal.in{opacity:1;transform:none}
+</style>
+
+<%- include('partials/footer') %>

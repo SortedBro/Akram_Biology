@@ -1,0 +1,89 @@
+<% const page = 'students' %>
+<%- include('layout-start') %>
+
+<div class="topbar">
+  <div class="topbar-title">👨‍🎓 Students</div>
+  <div class="topbar-right">
+    <span class="admin-badge">Total: <%= students.length %></span>
+    <a href="/enroll" target="_blank" class="btn btn-solid">+ Add Student</a>
+  </div>
+</div>
+
+<% if (success && success.length) { %><div class="alert alert-success"><%= success[0] %></div><% } %>
+<% if (error   && error.length)   { %><div class="alert alert-error"  ><%= error[0]   %></div><% } %>
+
+<!-- FILTERS -->
+<form method="GET" action="/admin/students" class="filter-bar">
+  <input type="text" name="search" placeholder="🔍 Search name or phone..." value="<%= filter.search || '' %>" style="min-width:220px">
+  <select name="status">
+    <option value="">All Status</option>
+    <option value="pending"   <%= filter.status==='pending'   ? 'selected':'' %>>Pending</option>
+    <option value="confirmed" <%= filter.status==='confirmed' ? 'selected':'' %>>Confirmed</option>
+    <option value="cancelled" <%= filter.status==='cancelled' ? 'selected':'' %>>Cancelled</option>
+  </select>
+  <select name="className">
+    <option value="">All Classes</option>
+    <% ['Class 9','Class 10','Class 11','Class 12','NEET Dropper'].forEach(function(c){ %>
+    <option value="<%= c %>" <%= filter.className===c ? 'selected':'' %>><%= c %></option>
+    <% }); %>
+  </select>
+  <button type="submit" class="btn btn-green">Filter</button>
+  <a href="/admin/students" class="btn btn-gray">Clear</a>
+</form>
+
+<!-- TABLE -->
+<div class="table-card">
+  <div class="table-header">
+    <h3>All Enrollments</h3>
+    <div style="font-size:0.8rem;color:var(--muted)"><%= students.length %> record(s) found</div>
+  </div>
+  <% if (students.length) { %>
+  <div style="overflow-x:auto">
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Student</th>
+        <th>Phone</th>
+        <th>Class</th>
+        <th>Batch</th>
+        <th>Status</th>
+        <th>Fee</th>
+        <th>Date</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% students.forEach(function(s, i){ %>
+      <tr>
+        <td style="color:var(--muted);font-size:0.8rem"><%= i+1 %></td>
+        <td>
+          <strong><%= s.studentName %></strong>
+          <% if(s.parentName){ %><br><span style="font-size:0.76rem;color:var(--muted)">P: <%= s.parentName %></span><% } %>
+        </td>
+        <td>
+          <a href="tel:<%= s.phone %>" style="color:var(--green3);text-decoration:none;font-size:0.85rem"><%= s.phone %></a>
+          <% if(s.email){ %><br><span style="font-size:0.74rem;color:var(--muted)"><%= s.email %></span><% } %>
+        </td>
+        <td><%= s.className %></td>
+        <td style="font-size:0.8rem;color:var(--muted)"><%= s.batchName || '—' %></td>
+        <td><span class="badge badge-<%= s.status %>"><%= s.status.toUpperCase() %></span></td>
+        <td><span class="badge badge-<%= s.feeStatus %>"><%= s.feeStatus.toUpperCase() %></span></td>
+        <td style="font-size:0.78rem;color:var(--muted)"><%= new Date(s.enrolledAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) %></td>
+        <td>
+          <a href="/admin/students/<%= s._id %>" class="btn btn-green" style="font-size:0.76rem;padding:5px 10px">Manage</a>
+        </td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+  </div>
+  <% } else { %>
+  <div class="empty-state">
+    <div class="emoji">🌱</div>
+    <p>No students found matching your filters.</p>
+  </div>
+  <% } %>
+</div>
+
+<%- include('layout-end') %>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg)">
+
+<div style="width:100%;max-width:420px;padding:24px">
+  <div style="text-align:center;margin-bottom:36px">
+    <div style="font-size:3rem;margin-bottom:12px">🧬</div>
+    <div style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;color:var(--green2)">Akram Biology</div>
+    <div style="font-size:0.8rem;color:var(--muted);margin-top:4px;letter-spacing:1px;text-transform:uppercase">Admin Panel</div>
+  </div>
+
+  <% if (error && error.length) { %>
+    <div class="alert alert-error"><%= error[0] %></div>
+  <% } %>
+
+  <div class="form-card">
+    <h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:900;margin-bottom:24px">Sign In</h2>
+    <form action="/admin/login" method="POST">
+      <div class="fg"><label>Username</label><input type="text" name="username" placeholder="akram" required autofocus></div>
+      <div class="fg"><label>Password</label><input type="password" name="password" placeholder="••••••••" required></div>
+      <button type="submit" class="btn btn-solid" style="width:100%;padding:13px;font-size:0.95rem;border-radius:10px;margin-top:8px">
+        🔐 Sign In to Admin Panel
+      </button>
+    </form>
+  </div>
+
+  <div style="text-align:center;margin-top:20px">
+    <a href="/" style="font-size:0.82rem;color:var(--muted);text-decoration:none">← Back to Website</a>
+  </div>
+</div>
+</body>
+</html>

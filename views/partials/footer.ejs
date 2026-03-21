@@ -1,0 +1,87 @@
+<hr class="divider">
+<footer>
+  <div class="footer-grid">
+    <div>
+      <span class="footer-brand-name">🧬 Akram Biology</span>
+      <p class="footer-tagline">Expert offline biology tuition in Malda, West Bengal. Specialized coaching for Class 9–12 and NEET aspirants by Akram Sir.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul class="footer-links">
+        <li><a href="/#about">About Akram Sir</a></li>
+        <li><a href="/#topics">Topics Covered</a></li>
+        <li><a href="/#schedule">Batch Schedule</a></li>
+        <li><a href="/enroll">Enroll Now</a></li>
+        <li><a href="/#contact">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul class="footer-links">
+        <li><a href="tel:+919876543210">📞 +91 98765 43210</a></li>
+        <li><a href="https://wa.me/919876543210" target="_blank">💬 WhatsApp Us</a></li>
+        <li><a href="#">📍 English Bazar, Malda</a></li>
+        <li><a href="mailto:akrambiology@gmail.com">✉️ akrambiology@gmail.com</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2025 Akram Biology Tuition. All rights reserved.</p>
+    <a href="https://wa.me/919876543210" target="_blank" class="wa-btn">
+      💬 Chat on WhatsApp
+    </a>
+  </div>
+</footer>
+
+<!-- Floating WhatsApp -->
+<a href="https://wa.me/919876543210" target="_blank"
+   style="position:fixed;bottom:28px;right:28px;z-index:200;
+          width:54px;height:54px;border-radius:50%;
+          background:#25d366;display:flex;align-items:center;justify-content:center;
+          font-size:1.6rem;box-shadow:0 6px 28px rgba(37,211,102,0.45);
+          transition:transform 0.2s;text-decoration:none"
+   onmouseenter="this.style.transform='scale(1.12)'"
+   onmouseleave="this.style.transform='scale(1)'">💬</a>
+
+<script>
+  // Scroll reveal
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+  // Particles canvas
+  const canvas = document.getElementById('bio-canvas');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    let W, H, pts = [];
+    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+    resize(); window.addEventListener('resize', resize);
+    for (let i = 0; i < 70; i++) pts.push({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight + window.innerHeight,
+      r: Math.random() * 2.5 + 0.8,
+      speed: Math.random() * 0.3 + 0.1,
+      op: Math.random() * 0.35 + 0.08,
+      hue: Math.random() > 0.5 ? 142 : 165
+    });
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      for (let i = 0; i < pts.length; i++) {
+        for (let j = i + 1; j < pts.length; j++) {
+          const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
+          const d = Math.sqrt(dx*dx + dy*dy);
+          if (d < 110) { ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y); ctx.strokeStyle = `rgba(34,197,94,${0.035*(1-d/110)})`; ctx.lineWidth = 0.5; ctx.stroke(); }
+        }
+        ctx.beginPath(); ctx.arc(pts[i].x, pts[i].y, pts[i].r, 0, Math.PI*2);
+        ctx.fillStyle = `hsla(${pts[i].hue},70%,50%,${pts[i].op})`; ctx.fill();
+        pts[i].y -= pts[i].speed;
+        if (pts[i].y < -20) { pts[i].y = H + 10; pts[i].x = Math.random() * W; }
+      }
+      requestAnimationFrame(draw);
+    }
+    draw();
+  }
+</script>
+</body>
+</html>

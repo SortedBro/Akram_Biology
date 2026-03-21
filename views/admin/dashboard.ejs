@@ -1,0 +1,92 @@
+<% const page = 'dashboard' %>
+<%- include('layout-start') %>
+
+<div class="topbar">
+  <div class="topbar-title">🌿 Dashboard</div>
+  <div class="topbar-right">
+    <span class="admin-badge">👤 <%= adminName %></span>
+    <a href="/enroll" target="_blank" class="btn btn-green">+ New Student</a>
+  </div>
+</div>
+
+<% if (success && success.length) { %><div class="alert alert-success"><%= success[0] %></div><% } %>
+<% if (error   && error.length)   { %><div class="alert alert-error"  ><%= error[0]   %></div><% } %>
+
+<!-- STATS -->
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-label">Total Students</div>
+    <div class="stat-value green"><%= stats.totalStudents %></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Pending Enrollments</div>
+    <div class="stat-value yellow"><%= stats.pending %></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Confirmed Students</div>
+    <div class="stat-value teal"><%= stats.confirmed %></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Unread Messages</div>
+    <div class="stat-value red"><%= stats.unreadMessages %></div>
+  </div>
+</div>
+
+<!-- BATCHES OVERVIEW -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
+  <% batches.forEach(function(b){ %>
+  <div class="form-card" style="padding:20px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <strong style="font-size:0.9rem"><%= b.name %></strong>
+      <span class="badge <%= b.isActive ? 'badge-active':'badge-inactive' %>"><%= b.isActive ? 'Active':'Inactive' %></span>
+    </div>
+    <div style="background:var(--sur2);border-radius:8px;overflow:hidden;height:8px;margin-bottom:8px">
+      <div style="height:100%;width:<%= Math.min((b.currentStudents/b.maxStudents)*100,100) %>%;background:linear-gradient(90deg,#166534,#22c55e);border-radius:8px;transition:width 1s ease"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:0.78rem;color:var(--muted)">
+      <span><%= b.currentStudents %>/<%= b.maxStudents %> students</span>
+      <span>₹<%= b.fee %>/mo</span>
+    </div>
+  </div>
+  <% }); %>
+</div>
+
+<!-- RECENT STUDENTS -->
+<div class="table-card">
+  <div class="table-header">
+    <h3>Recent Enrollments</h3>
+    <a href="/admin/students" class="btn btn-green">View All →</a>
+  </div>
+  <% if (recentStudents.length) { %>
+  <table>
+    <thead>
+      <tr>
+        <th>Student</th>
+        <th>Class</th>
+        <th>Phone</th>
+        <th>Batch</th>
+        <th>Status</th>
+        <th>Enrolled</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% recentStudents.forEach(function(s){ %>
+      <tr>
+        <td><strong><%= s.studentName %></strong><br><span style="font-size:0.76rem;color:var(--muted)"><%= s.parentName || '' %></span></td>
+        <td><%= s.className %></td>
+        <td><a href="tel:<%= s.phone %>" style="color:var(--green3);text-decoration:none"><%= s.phone %></a></td>
+        <td><%= s.batchName || '—' %></td>
+        <td><span class="badge badge-<%= s.status %>"><%= s.status.toUpperCase() %></span></td>
+        <td style="color:var(--muted);font-size:0.8rem"><%= new Date(s.enrolledAt).toLocaleDateString('en-IN') %></td>
+        <td><a href="/admin/students/<%= s._id %>" class="btn btn-green" style="font-size:0.76rem;padding:5px 12px">Manage</a></td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+  <% } else { %>
+  <div class="empty-state"><div class="emoji">🌱</div><p>No students yet. Share the enrollment link!</p></div>
+  <% } %>
+</div>
+
+<%- include('layout-end') %>
