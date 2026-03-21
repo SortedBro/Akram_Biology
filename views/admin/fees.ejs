@@ -1,0 +1,208 @@
+<%- include('layout-start') %>
+
+<div class="topbar">
+  <div class="topbar-title">💰 Fees Tracker</div>
+  <div class="topbar-right">
+    <span class="admin-badge">
+      <%= MONTHS[month] %> <%= year %>
+    </span>
+  </div>
+</div>
+
+<% if (success && success.length) { %><div class="alert alert-success"><%= success[0] %></div><% } %>
+<% if (error   && error.length)   { %><div class="alert alert-error"  ><%= error[0]   %></div><% } %>
+
+<!-- MONTH/YEAR SELECTOR -->
+<form method="GET" action="/admin/fees" style="display:flex;gap:10px;align-items:center;margin-bottom:24px;flex-wrap:wrap">
+  <select name="month" style="width:auto;padding:9px 14px;font-size:0.88rem">
+    <% MONTHS.forEach(function(m, i){ %>
+    <option value="<%= i %>" <%= i===month ? 'selected':'' %>><%= m %></option>
+    <% }); %>
+  </select>
+  <select name="year" style="width:auto;padding:9px 14px;font-size:0.88rem">
+    <% years.forEach(function(y){ %>
+    <option value="<%= y %>" <%= y===year ? 'selected':'' %>><%= y %></option>
+    <% }); %>
+  </select>
+  <button type="submit" class="btn btn-green">View →</button>
+
+  <!-- Quick month nav -->
+  <div style="display:flex;gap:6px;margin-left:8px">
+    <% const prevMonth = month===0 ? 11 : month-1; const prevYear = month===0 ? year-1 : year; %>
+    <% const nextMonth = month===11 ? 0 : month+1; const nextYear = month===11 ? year+1 : year; %>
+    <a href="/admin/fees?month=<%= prevMonth %>&year=<%= prevYear %>" class="btn btn-gray" style="padding:8px 14px">← Prev</a>
+    <a href="/admin/fees?month=<%= nextMonth %>&year=<%= nextYear %>" class="btn btn-gray" style="padding:8px 14px">Next →</a>
+  </div>
+</form>
+
+<!-- STATS ROW -->
+<div class="stats-row" style="grid-template-columns:repeat(5,1fr);margin-bottom:24px">
+  <div class="stat-card">
+    <div class="stat-label">Total Students</div>
+    <div class="stat-value green"><%= stats.total %></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Paid</div>
+    <div class="stat-value" style="color:var(--green2)"><%= stats.paid %></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Unpaid</div>
+    <div class="stat-value" style="color:var(--danger)"><%= stats.unpaid %></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Partial</div>
+    <div class="stat-value" style="color:var(--warn)"><%= stats.partial %></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Collected (₹)</div>
+    <div class="stat-value" style="color:var(--lime)">₹<%= stats.totalAmount.toLocaleString('en-IN') %></div>
+  </div>
+</div>
+
+<!-- PROGRESS BAR -->
+<% if(stats.total > 0){ %>
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin-bottom:24px">
+  <div style="display:flex;justify-content:space-between;font-size:0.82rem;color:var(--muted);margin-bottom:10px">
+    <span>Collection Progress — <%= MONTHS[month] %> <%= year %></span>
+    <span style="color:var(--green2);font-weight:600"><%= Math.round((stats.paid/stats.total)*100) %>% collected</span>
+  </div>
+  <div style="background:var(--sur2);border-radius:8px;overflow:hidden;height:10px;display:flex">
+    <div style="width:<%= (stats.paid/stats.total)*100 %>%;background:linear-gradient(90deg,#166534,#22c55e);transition:width 0.8s ease"></div>
+    <div style="width:<%= (stats.partial/stats.total)*100 %>%;background:var(--warn);opacity:0.7"></div>
+  </div>
+  <div style="display:flex;gap:20px;margin-top:10px;font-size:0.76rem">
+    <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#22c55e;display:inline-block"></span> Paid (<%= stats.paid %>)</span>
+    <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--warn);display:inline-block"></span> Partial (<%= stats.partial %>)</span>
+    <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--sur2);border:1px solid var(--border);display:inline-block"></span> Unpaid (<%= stats.unpaid %>)</span>
+  </div>
+</div>
+<% } %>
+
+<!-- STUDENTS TABLE -->
+<div class="table-card">
+  <div class="table-header">
+    <h3>Student Fee Status — <%= MONTHS[month] %> <%= year %></h3>
+    <div style="font-size:0.8rem;color:var(--muted)"><%= rows.length %> confirmed students</div>
+  </div>
+
+  <% if(rows.length){ %>
+  <div style="overflow-x:auto">
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Student</th>
+        <th>Class</th>
+        <th>Phone</th>
+        <th>Batch Fee</th>
+        <th>Status</th>
+        <th>Amount Paid</th>
+        <th>Paid On</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% rows.forEach(function(row, i){ %>
+      <% const rec = row.record; const s = row.student; %>
+      <tr style="<%= !rec || rec.status==='unpaid' ? 'background:rgba(239,68,68,0.02)' : rec.status==='paid' ? 'background:rgba(34,197,94,0.02)' : 'background:rgba(245,158,11,0.02)' %>">
+        <td style="color:var(--muted);font-size:0.8rem"><%= i+1 %></td>
+        <td>
+          <a href="/admin/students/<%= s._id %>" style="color:var(--green2);text-decoration:none;font-weight:600"><%= s.studentName %></a>
+          <% if(s.parentName){ %><br><span style="font-size:0.74rem;color:var(--muted)"><%= s.parentName %></span><% } %>
+        </td>
+        <td style="font-size:0.85rem"><%= s.className %></td>
+        <td><a href="tel:<%= s.phone %>" style="color:var(--green3);text-decoration:none;font-size:0.83rem"><%= s.phone %></a></td>
+        <td style="color:var(--lime);font-weight:600;font-size:0.85rem">
+          <% const batch = s.batchName || '—'; %>
+          <%= batch %>
+        </td>
+        <td>
+          <span class="badge badge-<%= rec ? rec.status : 'unpaid' %>">
+            <%= rec ? rec.status.toUpperCase() : 'UNPAID' %>
+          </span>
+        </td>
+        <td style="font-weight:600;color:var(--text)">
+          <%= rec && rec.amount ? '₹' + rec.amount.toLocaleString('en-IN') : '—' %>
+        </td>
+        <td style="font-size:0.78rem;color:var(--muted)">
+          <%= rec && rec.paidAt ? new Date(rec.paidAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short'}) : '—' %>
+        </td>
+        <td>
+          <!-- Quick Mark Button -->
+          <button onclick="openFeeModal('<%= s._id %>','<%= s.studentName %>',<%= month %>,<%= year %>,'<%= rec ? rec.status : 'unpaid' %>',<%= rec ? rec.amount : 0 %>,'<%= rec ? (rec.note||'') : '' %>')"
+                  class="btn btn-green" style="font-size:0.76rem;padding:5px 10px">
+            ✏️ Update
+          </button>
+        </td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+  </div>
+  <% } else { %>
+  <div class="empty-state">
+    <div class="emoji">👨‍🎓</div>
+    <p>No confirmed students yet. Confirm students from the Students panel first.</p>
+  </div>
+  <% } %>
+</div>
+
+<!-- ── FEE UPDATE MODAL ─────────────────────────────────────── -->
+<div id="feeModal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);align-items:center;justify-content:center">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:36px;width:100%;max-width:440px;margin:20px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+      <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:900">Update Fee</h3>
+      <button onclick="closeFeeModal()" style="background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer">✕</button>
+    </div>
+    <div id="modalStudentName" style="font-size:0.82rem;color:var(--lime);letter-spacing:1px;text-transform:uppercase;margin-bottom:20px"></div>
+
+    <form action="/admin/fees/mark" method="POST">
+      <input type="hidden" name="studentId" id="modalStudentId">
+      <input type="hidden" name="month" id="modalMonth">
+      <input type="hidden" name="year"  id="modalYear">
+
+      <div class="fg">
+        <label>Fee Status</label>
+        <select name="status" id="modalStatus">
+          <option value="paid">✅ Paid</option>
+          <option value="partial">🟡 Partial</option>
+          <option value="unpaid">❌ Unpaid</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Amount Received (₹)</label>
+        <input type="number" name="amount" id="modalAmount" placeholder="e.g. 600" min="0">
+      </div>
+      <div class="fg">
+        <label>Note (optional)</label>
+        <input type="text" name="note" id="modalNote" placeholder="e.g. Paid cash, UPI ref #123...">
+      </div>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button type="submit" class="btn btn-solid" style="flex:1;padding:12px">💾 Save</button>
+        <button type="button" onclick="closeFeeModal()" class="btn btn-gray" style="padding:12px 20px">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openFeeModal(id, name, month, year, status, amount, note) {
+  document.getElementById('modalStudentId').value = id;
+  document.getElementById('modalStudentName').textContent = '👤 ' + name;
+  document.getElementById('modalMonth').value  = month;
+  document.getElementById('modalYear').value   = year;
+  document.getElementById('modalStatus').value = status;
+  document.getElementById('modalAmount').value = amount || '';
+  document.getElementById('modalNote').value   = note || '';
+  const modal = document.getElementById('feeModal');
+  modal.style.display = 'flex';
+}
+function closeFeeModal() {
+  document.getElementById('feeModal').style.display = 'none';
+}
+document.getElementById('feeModal').addEventListener('click', function(e) {
+  if (e.target === this) closeFeeModal();
+});
+</script>
+
+<%- include('layout-end') %>

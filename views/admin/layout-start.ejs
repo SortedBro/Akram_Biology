@@ -9,7 +9,6 @@
 </head>
 <body>
 <div class="admin-layout">
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-brand"><span>🧬</span> Akram Bio</div>
     <nav class="sidebar-nav">
@@ -18,6 +17,9 @@
       </a>
       <a href="/admin/students" class="nav-item <%= (locals.page==='students') ? 'active' : '' %>">
         <span class="nav-icon">👨‍🎓</span> Students
+      </a>
+      <a href="/admin/fees" class="nav-item <%= (locals.page==='fees') ? 'active' : '' %>">
+        <span class="nav-icon">💰</span> Fees
       </a>
       <a href="/admin/batches" class="nav-item <%= (locals.page==='batches') ? 'active' : '' %>">
         <span class="nav-icon">📅</span> Batches
@@ -36,6 +38,4 @@
       </a>
     </div>
   </aside>
-
-  <!-- MAIN -->
   <main class="main-area">

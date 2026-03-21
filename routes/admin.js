@@ -1,15 +1,16 @@
 const express  = require('express');
 const router   = express.Router();
 const bcrypt   = require('bcryptjs');
-const { Student, Batch, Contact, Admin } = require('../models');
+const { Student, Batch, Contact, Admin, FeeRecord } = require('../models');
 const { isAdmin, isGuest } = require('../middleware/auth');
+const { sendEnrollmentConfirmation, sendAdminNotification, sendFeeConfirmation } = require('../config/mailer');
+
+const MONTHS = ['January','February','March','April','May','June',
+                'July','August','September','October','November','December'];
 
 // ─── LOGIN ────────────────────────────────────────────────────
 router.get('/login', isGuest, (req, res) => {
-  res.render('admin/login', {
-    title: 'Admin Login — Akram Biology',
-    error: req.flash('error')
-  });
+  res.render('admin/login', { title: 'Admin Login — Akram Biology', error: req.flash('error') });
 });
 
 router.post('/login', isGuest, async (req, res) => {
@@ -36,19 +37,35 @@ router.get('/logout', (req, res) => {
 // ─── DASHBOARD ────────────────────────────────────────────────
 router.get('/dashboard', isAdmin, async (req, res) => {
   try {
-    const [totalStudents, pending, confirmed, batches, unreadMessages] = await Promise.all([
+    const now = new Date();
+    const thisMonth = now.getMonth();
+    const thisYear  = now.getFullYear();
+
+    const [totalStudents, pending, confirmed, batches, unreadMessages,
+           feePaidThisMonth, feeUnpaidThisMonth, totalCollectedThisMonth] = await Promise.all([
       Student.countDocuments(),
       Student.countDocuments({ status: 'pending' }),
       Student.countDocuments({ status: 'confirmed' }),
       Batch.find({ isActive: true }).lean(),
-      Contact.countDocuments({ isRead: false })
+      Contact.countDocuments({ isRead: false }),
+      FeeRecord.countDocuments({ month: thisMonth, year: thisYear, status: 'paid' }),
+      FeeRecord.countDocuments({ month: thisMonth, year: thisYear, status: 'unpaid' }),
+      FeeRecord.aggregate([
+        { $match: { month: thisMonth, year: thisYear, status: 'paid' } },
+        { $group: { _id: null, total: { $sum: '$amount' } } }
+      ])
     ]);
+
     const recentStudents = await Student.find().sort({ createdAt: -1 }).limit(5).lean();
+    const totalAmount = totalCollectedThisMonth[0]?.total || 0;
+
     res.render('admin/dashboard', {
       page: 'dashboard',
       title: 'Dashboard — Akram Biology Admin',
       adminName: req.session.adminName,
-      stats: { totalStudents, pending, confirmed, unreadMessages },
+      stats: { totalStudents, pending, confirmed, unreadMessages,
+               feePaidThisMonth, feeUnpaidThisMonth, totalAmount,
+               currentMonth: MONTHS[thisMonth] },
       batches,
       recentStudents,
       success: req.flash('success'),
@@ -92,16 +109,30 @@ router.get('/students/:id', isAdmin, async (req, res) => {
   try {
     const student = await Student.findById(req.params.id).populate('batch').lean();
     if (!student) { req.flash('error', 'Student not found'); return res.redirect('/admin/students'); }
-    const batches = await Batch.find({ isActive: true }).lean();
+
+    const batches    = await Batch.find({ isActive: true }).lean();
+    const feeRecords = await FeeRecord.find({ student: student._id }).sort({ year: -1, month: -1 }).lean();
+
+    // Build last 12 months grid
+    const now = new Date();
+    const last12 = [];
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const m = d.getMonth(), y = d.getFullYear();
+      const rec = feeRecords.find(r => r.month === m && r.year === y);
+      last12.push({ month: m, year: y, monthName: MONTHS[m], record: rec || null });
+    }
+
     res.render('admin/student-detail', {
       page: 'students',
       title: `${student.studentName} — Admin`,
       adminName: req.session.adminName,
-      student, batches,
+      student, batches, feeRecords, last12, MONTHS,
       success: req.flash('success'),
       error:   req.flash('error')
     });
   } catch (err) {
+    console.error(err);
     res.redirect('/admin/students');
   }
 });
@@ -111,9 +142,9 @@ router.post('/students/:id/status', isAdmin, async (req, res) => {
   try {
     const { status, feeStatus, notes } = req.body;
     const update = {};
-    if (status)    { update.status    = status; if (status === 'confirmed') update.confirmedAt = new Date(); }
-    if (feeStatus) update.feeStatus = feeStatus;
-    if (notes !== undefined) update.notes = notes;
+    if (status)              { update.status = status; if (status === 'confirmed') update.confirmedAt = new Date(); }
+    if (feeStatus)             update.feeStatus = feeStatus;
+    if (notes !== undefined)   update.notes = notes;
     await Student.findByIdAndUpdate(req.params.id, update);
     req.flash('success', 'Student updated successfully');
     res.redirect(`/admin/students/${req.params.id}`);
@@ -128,12 +159,131 @@ router.post('/students/:id/delete', isAdmin, async (req, res) => {
   try {
     const student = await Student.findById(req.params.id);
     if (student?.batch) await Batch.findByIdAndUpdate(student.batch, { $inc: { currentStudents: -1 } });
+    await FeeRecord.deleteMany({ student: req.params.id });
     await Student.findByIdAndDelete(req.params.id);
     req.flash('success', 'Student removed');
     res.redirect('/admin/students');
   } catch (err) {
     req.flash('error', 'Delete failed');
     res.redirect('/admin/students');
+  }
+});
+
+// ─── FEE OVERVIEW PAGE ───────────────────────────────────────
+router.get('/fees', isAdmin, async (req, res) => {
+  try {
+    const now   = new Date();
+    const month = parseInt(req.query.month ?? now.getMonth());
+    const year  = parseInt(req.query.year  ?? now.getFullYear());
+
+    // All confirmed students
+    const students = await Student.find({ status: 'confirmed' }).lean();
+
+    // Fee records for selected month/year
+    const records = await FeeRecord.find({ month, year }).lean();
+    const recordMap = {};
+    records.forEach(r => { recordMap[r.student.toString()] = r; });
+
+    // Build rows
+    const rows = students.map(s => ({
+      student: s,
+      record: recordMap[s._id.toString()] || null
+    }));
+
+    const paid    = rows.filter(r => r.record?.status === 'paid').length;
+    const unpaid  = rows.filter(r => !r.record || r.record.status === 'unpaid').length;
+    const partial = rows.filter(r => r.record?.status === 'partial').length;
+    const totalAmount = records.filter(r => r.status === 'paid').reduce((a, r) => a + r.amount, 0);
+
+    // Build year list (enrolled year to current)
+    const years = [];
+    for (let y = now.getFullYear(); y >= now.getFullYear() - 2; y--) years.push(y);
+
+    res.render('admin/fees', {
+      page: 'fees',
+      title: 'Fees — Akram Biology Admin',
+      adminName: req.session.adminName,
+      rows, month, year, MONTHS, years,
+      stats: { paid, unpaid, partial, totalAmount, total: students.length },
+      success: req.flash('success'),
+      error:   req.flash('error')
+    });
+  } catch (err) {
+    console.error(err);
+    res.redirect('/admin/dashboard');
+  }
+});
+
+// ─── MARK FEE (from overview page) ──────────────────────────
+router.post('/fees/mark', isAdmin, async (req, res) => {
+  try {
+    const { studentId, month, year, status, amount, note } = req.body;
+    const m = parseInt(month), y = parseInt(year);
+
+    const student = await Student.findById(studentId);
+    if (!student) { req.flash('error', 'Student not found'); return res.redirect(`/admin/fees?month=${m}&year=${y}`); }
+
+    const record = await FeeRecord.findOneAndUpdate(
+      { student: studentId, month: m, year: y },
+      {
+        student: studentId,
+        studentName: student.studentName,
+        month: m, year: y,
+        amount: Number(amount) || 0,
+        status,
+        note: note || '',
+        paidAt: status === 'paid' ? new Date() : null
+      },
+      { upsert: true, new: true }
+    );
+
+    // Send email if marked as paid and student has email
+    if (status === 'paid' && student.email) {
+      sendFeeConfirmation(student, record).catch(console.error);
+    }
+
+    req.flash('success', `Fee marked as ${status} for ${student.studentName}`);
+    res.redirect(`/admin/fees?month=${m}&year=${y}`);
+  } catch (err) {
+    console.error(err);
+    req.flash('error', 'Could not update fee');
+    res.redirect('/admin/fees');
+  }
+});
+
+// ─── MARK FEE (from student detail page) ─────────────────────
+router.post('/students/:id/fee', isAdmin, async (req, res) => {
+  try {
+    const { month, year, status, amount, note } = req.body;
+    const m = parseInt(month), y = parseInt(year);
+
+    const student = await Student.findById(req.params.id);
+    if (!student) { req.flash('error', 'Student not found'); return res.redirect('/admin/students'); }
+
+    const record = await FeeRecord.findOneAndUpdate(
+      { student: req.params.id, month: m, year: y },
+      {
+        student: req.params.id,
+        studentName: student.studentName,
+        month: m, year: y,
+        amount: Number(amount) || 0,
+        status,
+        note: note || '',
+        paidAt: status === 'paid' ? new Date() : null
+      },
+      { upsert: true, new: true }
+    );
+
+    if (status === 'paid' && student.email) {
+      sendFeeConfirmation(student, record).catch(console.error);
+    }
+
+    req.flash('success', `${MONTHS[m]} ${y} fee marked as ${status}`);
+    res.redirect(`/admin/students/${req.params.id}`);
+  } catch (err) {
+    console.error(err);
+    req.flash('error', 'Fee update failed');
+    res.redirect(`/admin/students/${req.params.id}`);
   }
 });
 
@@ -188,7 +338,7 @@ router.get('/messages', isAdmin, async (req, res) => {
   const messages = await Contact.find().sort({ createdAt: -1 }).lean();
   await Contact.updateMany({ isRead: false }, { isRead: true });
   res.render('admin/messages', {
-      page: 'messages',
+    page: 'messages',
     title: 'Messages — Admin',
     adminName: req.session.adminName,
     messages,
