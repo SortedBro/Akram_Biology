@@ -44,6 +44,9 @@ app.use((req, res, next) => {
 // ─── ROUTES ───────────────────────────────────────────────────
 app.use('/',      require('./routes/public'));
 app.use('/admin', require('./routes/admin'));
+app.get('/alive',(req,res)=>{
+  res.json({m:"this is text."})
+})
 
 // ─── 404 ─────────────────────────────────────────────────────
 app.use((req, res) => {
