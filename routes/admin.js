@@ -137,14 +137,51 @@ router.get('/students/:id', isAdmin, async (req, res) => {
   }
 });
 
+// ─── AUTO-CREATE MONTHLY FEE RECORDS ─────────────────────────
+// Called when student is confirmed — creates unpaid record for
+// current month + all future months up to 12 months ahead
+async function autoCreateFeeRecords(studentId, batchFee) {
+  const now = new Date();
+  const operations = [];
+  for (let i = 0; i < 12; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+    operations.push({
+      updateOne: {
+        filter: { student: studentId, month: d.getMonth(), year: d.getFullYear() },
+        update: {
+          $setOnInsert: {
+            student:     studentId,
+            month:       d.getMonth(),
+            year:        d.getFullYear(),
+            amount:      batchFee || 0,
+            status:      'unpaid',
+            paidAt:      null,
+            note:        ''
+          }
+        },
+        upsert: true
+      }
+    });
+  }
+  await FeeRecord.bulkWrite(operations);
+}
+
 // ─── UPDATE STUDENT STATUS ────────────────────────────────────
 router.post('/students/:id/status', isAdmin, async (req, res) => {
   try {
     const { status, feeStatus, notes } = req.body;
     const update = {};
-    if (status)              { update.status = status; if (status === 'confirmed') update.confirmedAt = new Date(); }
-    if (feeStatus)             update.feeStatus = feeStatus;
-    if (notes !== undefined)   update.notes = notes;
+    if (status) {
+      update.status = status;
+      if (status === 'confirmed') {
+        update.confirmedAt = new Date();
+        // Auto-create 12 months of unpaid fee records
+        const student = await Student.findById(req.params.id).populate('batch');
+        const fee = student?.batch?.fee || 0;
+        await autoCreateFeeRecords(req.params.id, fee);
+      }
+    }
+    if (notes !== undefined) update.notes = notes;
     await Student.findByIdAndUpdate(req.params.id, update);
     req.flash('success', 'Student updated successfully');
     res.redirect(`/admin/students/${req.params.id}`);
@@ -177,7 +214,24 @@ router.get('/fees', isAdmin, async (req, res) => {
     const year  = parseInt(req.query.year  ?? now.getFullYear());
 
     // All confirmed students
-    const students = await Student.find({ status: 'confirmed' }).lean();
+    const students = await Student.find({ status: 'confirmed' }).populate('batch').lean();
+
+    // Auto-ensure every confirmed student has a record for selected month/year
+    for (const s of students) {
+      await FeeRecord.updateOne(
+        { student: s._id, month, year },
+        { $setOnInsert: {
+            student:     s._id,
+            studentName: s.studentName,
+            month, year,
+            amount:      s.batch?.fee || 0,
+            status:      'unpaid',
+            paidAt:      null,
+            note:        ''
+        }},
+        { upsert: true }
+      );
+    }
 
     // Fee records for selected month/year
     const records = await FeeRecord.find({ month, year }).lean();
@@ -283,6 +337,54 @@ router.post('/students/:id/fee', isAdmin, async (req, res) => {
   } catch (err) {
     console.error(err);
     req.flash('error', 'Fee update failed');
+    res.redirect(`/admin/students/${req.params.id}`);
+  }
+});
+
+// ─── EDIT STUDENT DETAILS ────────────────────────────────────
+router.post('/students/:id/edit', isAdmin, async (req, res) => {
+  try {
+    const { studentName, parentName, phone, email, className, batchId, notes } = req.body;
+
+    // Validate required fields
+    if (!studentName || !phone || !className) {
+      req.flash('error', 'Name, phone and class are required.');
+      return res.redirect(`/admin/students/${req.params.id}`);
+    }
+
+    const update = {
+      studentName: studentName.trim(),
+      parentName:  parentName?.trim() || '',
+      phone:       phone.trim(),
+      email:       email?.trim().toLowerCase() || '',
+      className,
+      notes:       notes?.trim() || ''
+    };
+
+    // If batch changed, update batchName and adjust student counts
+    if (batchId) {
+      const oldStudent = await Student.findById(req.params.id);
+      const newBatch   = await Batch.findById(batchId);
+      if (newBatch) {
+        // Decrease old batch count
+        if (oldStudent.batch && oldStudent.batch.toString() !== batchId) {
+          await Batch.findByIdAndUpdate(oldStudent.batch, { $inc: { currentStudents: -1 } });
+          await Batch.findByIdAndUpdate(batchId,          { $inc: { currentStudents:  1 } });
+        }
+        update.batch     = batchId;
+        update.batchName = newBatch.name;
+      }
+    } else {
+      update.batch     = null;
+      update.batchName = '';
+    }
+
+    await Student.findByIdAndUpdate(req.params.id, update);
+    req.flash('success', `✅ ${studentName} ki details update ho gayi!`);
+    res.redirect(`/admin/students/${req.params.id}`);
+  } catch (err) {
+    console.error(err);
+    req.flash('error', 'Edit failed. Please try again.');
     res.redirect(`/admin/students/${req.params.id}`);
   }
 });

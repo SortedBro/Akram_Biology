@@ -12,58 +12,151 @@
 <% if (success && success.length) { %><div class="alert alert-success"><%= success[0] %></div><% } %>
 <% if (error   && error.length)   { %><div class="alert alert-error"  ><%= error[0]   %></div><% } %>
 
-<!-- TOP ROW: Info + Update -->
+<!-- TOP ROW: Info + Status -->
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
 
-  <!-- Student Info -->
+  <!-- ── Student Info (read-only) ── -->
   <div class="form-card">
-    <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border)">Student Details</h3>
-    <div class="detail-grid">
-      <div class="detail-item"><label>Student Name</label><div class="val"><%= student.studentName %></div></div>
-      <div class="detail-item"><label>Parent Name</label><div class="val"><%= student.parentName || '—' %></div></div>
-      <div class="detail-item"><label>Phone / WhatsApp</label><div class="val"><a href="tel:<%= student.phone %>" style="color:var(--green2);text-decoration:none"><%= student.phone %></a></div></div>
-      <div class="detail-item"><label>Email</label><div class="val" style="font-size:0.83rem"><%= student.email || '—' %></div></div>
-      <div class="detail-item"><label>Class</label><div class="val"><%= student.className %></div></div>
-      <div class="detail-item"><label>Batch</label><div class="val"><%= student.batchName || '—' %></div></div>
-      <div class="detail-item"><label>Status</label><div class="val"><span class="badge badge-<%= student.status %>"><%= student.status.toUpperCase() %></span></div></div>
-      <div class="detail-item"><label>Enrolled On</label><div class="val" style="font-size:0.83rem"><%= new Date(student.enrolledAt).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'}) %></div></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border)">
+      <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem">Student Details</h3>
+      <button onclick="toggleEdit()" id="editToggleBtn" class="btn btn-green" style="font-size:0.78rem;padding:6px 14px">
+        ✏️ Edit Details
+      </button>
     </div>
-    <% if(student.message){ %>
-    <div style="margin-top:18px;padding:12px 14px;background:var(--sur2);border-radius:10px;border:1px solid var(--border)">
-      <label style="margin-bottom:6px">Message from Student</label>
-      <p style="font-size:0.86rem;color:var(--muted);line-height:1.7;font-style:italic">"<%= student.message %>"</p>
+
+    <!-- VIEW MODE -->
+    <div id="viewMode">
+      <div class="detail-grid">
+        <div class="detail-item"><label>Student Name</label><div class="val"><%= student.studentName %></div></div>
+        <div class="detail-item"><label>Parent Name</label><div class="val"><%= student.parentName || '—' %></div></div>
+        <div class="detail-item"><label>Phone / WhatsApp</label><div class="val"><a href="tel:<%= student.phone %>" style="color:var(--green2);text-decoration:none"><%= student.phone %></a></div></div>
+        <div class="detail-item"><label>Email</label><div class="val" style="font-size:0.83rem"><%= student.email || '—' %></div></div>
+        <div class="detail-item"><label>Class</label><div class="val"><%= student.className %></div></div>
+        <div class="detail-item"><label>Batch</label><div class="val"><%= student.batchName || '—' %></div></div>
+        <div class="detail-item"><label>Status</label><div class="val"><span class="badge badge-<%= student.status %>"><%= student.status.toUpperCase() %></span></div></div>
+        <div class="detail-item"><label>Enrolled On</label><div class="val" style="font-size:0.83rem"><%= new Date(student.enrolledAt).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'}) %></div></div>
+      </div>
+      <% if(student.notes){ %>
+      <div style="margin-top:14px;padding:12px 14px;background:var(--sur2);border-radius:10px;border:1px solid var(--border)">
+        <label style="margin-bottom:5px">Notes</label>
+        <p style="font-size:0.85rem;color:var(--muted);line-height:1.6"><%= student.notes %></p>
+      </div>
+      <% } %>
+      <% if(student.message){ %>
+      <div style="margin-top:12px;padding:12px 14px;background:var(--sur2);border-radius:10px;border:1px solid var(--border)">
+        <label style="margin-bottom:5px">Message from Student</label>
+        <p style="font-size:0.86rem;color:var(--muted);line-height:1.7;font-style:italic">"<%= student.message %>"</p>
+      </div>
+      <% } %>
     </div>
-    <% } %>
+
+    <!-- EDIT MODE (hidden by default) -->
+    <div id="editMode" style="display:none">
+      <form action="/admin/students/<%= student._id %>/edit" method="POST">
+        <div class="form-row2">
+          <div class="fg">
+            <label>Student Name *</label>
+            <input type="text" name="studentName" value="<%= student.studentName %>" required>
+          </div>
+          <div class="fg">
+            <label>Parent Name</label>
+            <input type="text" name="parentName" value="<%= student.parentName || '' %>">
+          </div>
+        </div>
+        <div class="form-row2">
+          <div class="fg">
+            <label>Phone / WhatsApp *</label>
+            <input type="tel" name="phone" value="<%= student.phone %>" required>
+          </div>
+          <div class="fg">
+            <label>Email</label>
+            <input type="email" name="email" value="<%= student.email || '' %>">
+          </div>
+        </div>
+        <div class="form-row2">
+          <div class="fg">
+            <label>Class *</label>
+            <select name="className" required>
+              <% ['Class 9','Class 10','Class 11','Class 12','NEET Dropper'].forEach(function(c){ %>
+              <option value="<%= c %>" <%= student.className===c ? 'selected':'' %>><%= c %></option>
+              <% }); %>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Batch</label>
+            <select name="batchId">
+              <option value="">— No batch —</option>
+              <% batches.forEach(function(b){ %>
+              <option value="<%= b._id %>" <%= (student.batch && student.batch._id && student.batch._id.toString()===b._id.toString()) ? 'selected':'' %>>
+                <%= b.name %> (₹<%= b.fee %>/mo)
+              </option>
+              <% }); %>
+            </select>
+          </div>
+        </div>
+        <div class="fg">
+          <label>Admin Notes</label>
+          <textarea name="notes" rows="2" placeholder="Internal notes..."><%= student.notes || '' %></textarea>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:4px">
+          <button type="submit" class="btn btn-solid" style="flex:1;padding:11px">💾 Save Changes</button>
+          <button type="button" onclick="toggleEdit()" class="btn btn-gray" style="padding:11px 18px">Cancel</button>
+        </div>
+      </form>
+    </div>
   </div>
 
-  <!-- Update -->
+  <!-- ── Status + Actions ── -->
   <div class="form-card">
-    <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border)">Update Student</h3>
+    <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border)">Enrollment Status</h3>
     <form action="/admin/students/<%= student._id %>/status" method="POST">
       <div class="fg">
-        <label>Enrollment Status</label>
+        <label>Status</label>
         <select name="status">
-          <option value="pending"   <%= student.status==='pending'   ?'selected':'' %>>Pending</option>
-          <option value="confirmed" <%= student.status==='confirmed' ?'selected':'' %>>Confirmed</option>
-          <option value="cancelled" <%= student.status==='cancelled' ?'selected':'' %>>Cancelled</option>
+          <option value="pending"   <%= student.status==='pending'   ?'selected':'' %>>⏳ Pending</option>
+          <option value="confirmed" <%= student.status==='confirmed' ?'selected':'' %>>✅ Confirmed</option>
+          <option value="cancelled" <%= student.status==='cancelled' ?'selected':'' %>>❌ Cancelled</option>
         </select>
       </div>
-      <div class="fg">
-        <label>Admin Notes</label>
-        <textarea name="notes" rows="3" placeholder="Internal notes..."><%= student.notes || '' %></textarea>
-      </div>
-      <button type="submit" class="btn btn-solid" style="width:100%;padding:11px">💾 Save Changes</button>
+      <button type="submit" class="btn btn-solid" style="width:100%;padding:11px">💾 Update Status</button>
     </form>
 
-    <div style="margin-top:18px;padding-top:18px;border-top:1px solid var(--border)">
-      <h4 style="font-size:0.78rem;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">Quick Actions</h4>
+    <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--border)">
+      <h4 style="font-size:0.78rem;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">Quick Actions</h4>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <a href="tel:<%= student.phone %>" class="btn btn-green">📞 Call</a>
-        <a href="https://wa.me/91<%= student.phone.replace(/\D/g,'') %>?text=Hello%20<%= encodeURIComponent(student.studentName) %>%2C%20this%20is%20Akram%20Sir!" target="_blank" class="btn btn-green">💬 WhatsApp</a>
+        <a href="https://wa.me/91<%= student.phone.replace(/\D/g,'') %>?text=Hello%20<%= encodeURIComponent(student.studentName) %>%2C%20this%20is%20Akram%20Sir%20from%20Akram%20Biology!" target="_blank" class="btn btn-green">💬 WhatsApp</a>
+        <% if(student.email){ %>
+        <a href="mailto:<%= student.email %>" class="btn btn-green">✉️ Email</a>
+        <% } %>
       </div>
     </div>
 
-    <div style="margin-top:18px;padding-top:18px;border-top:1px solid var(--border)">
+    <!-- Student Summary Stats -->
+    <% 
+      const paidMonths   = last12.filter(i => i.record && i.record.status==='paid').length;
+      const unpaidMonths = last12.filter(i => !i.record || i.record.status==='unpaid').length;
+      const totalCollected = last12.reduce((a,i) => a + (i.record && i.record.status==='paid' ? i.record.amount : 0), 0);
+    %>
+    <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--border)">
+      <h4 style="font-size:0.78rem;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">Fee Summary (Last 12 Months)</h4>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+        <div style="background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.18);border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:1.5rem;font-weight:900;color:var(--green2)"><%= paidMonths %></div>
+          <div style="font-size:0.68rem;color:var(--muted);margin-top:2px">Paid</div>
+        </div>
+        <div style="background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.18);border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:1.5rem;font-weight:900;color:#f87171"><%= unpaidMonths %></div>
+          <div style="font-size:0.68rem;color:var(--muted);margin-top:2px">Unpaid</div>
+        </div>
+        <div style="background:rgba(163,230,53,0.07);border:1px solid rgba(163,230,53,0.18);border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:1rem;font-weight:900;color:var(--lime)">₹<%= totalCollected.toLocaleString('en-IN') %></div>
+          <div style="font-size:0.68rem;color:var(--muted);margin-top:2px">Collected</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--border)">
       <h4 style="font-size:0.78rem;font-weight:700;color:#f87171;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">Danger Zone</h4>
       <form action="/admin/students/<%= student._id %>/delete" method="POST" onsubmit="return confirm('Remove <%= student.studentName %>? This cannot be undone.')">
         <button type="submit" class="btn btn-red">🗑 Remove Student</button>
@@ -73,16 +166,16 @@
 </div>
 
 <!-- ══ FEES PANEL ═══════════════════════════════════════════ -->
-<div class="form-card" style="margin-bottom:20px">
+<div class="form-card">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border)">
     <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem">💰 Fee History — Last 12 Months</h3>
     <button onclick="document.getElementById('addFeeForm').style.display = document.getElementById('addFeeForm').style.display==='none'?'block':'none'"
             class="btn btn-green">+ Record Fee</button>
   </div>
 
-  <!-- Add fee form (hidden by default) -->
+  <!-- Add fee form -->
   <div id="addFeeForm" style="display:none;background:var(--sur2);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:20px">
-    <h4 style="font-size:0.85rem;font-weight:700;color:var(--green3);margin-bottom:16px;letter-spacing:0.5px">Record Fee Payment</h4>
+    <h4 style="font-size:0.85rem;font-weight:700;color:var(--green3);margin-bottom:16px">Record Fee Payment</h4>
     <form action="/admin/students/<%= student._id %>/fee" method="POST">
       <div class="form-row3">
         <div class="fg">
@@ -121,7 +214,7 @@
         </div>
       </div>
       <div style="display:flex;gap:10px">
-        <button type="submit" class="btn btn-solid" style="padding:10px 24px">💾 Save Fee Record</button>
+        <button type="submit" class="btn btn-solid" style="padding:10px 24px">💾 Save</button>
         <button type="button" onclick="document.getElementById('addFeeForm').style.display='none'" class="btn btn-gray" style="padding:10px 16px">Cancel</button>
       </div>
     </form>
@@ -131,62 +224,38 @@
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
     <% last12.forEach(function(item){ %>
     <%
-      const isCurrentMonth = item.month === new Date().getMonth() && item.year === new Date().getFullYear();
+      const isNow = item.month===new Date().getMonth() && item.year===new Date().getFullYear();
       const rec = item.record;
-      let bg = 'rgba(239,68,68,0.06)';
-      let borderColor = 'rgba(239,68,68,0.2)';
-      let statusColor = '#f87171';
-      let statusText = 'UNPAID';
-      let icon = '❌';
-      if(rec && rec.status === 'paid')    { bg='rgba(34,197,94,0.06)';  borderColor='rgba(34,197,94,0.25)';  statusColor='#4ade80'; statusText='PAID';    icon='✅'; }
-      if(rec && rec.status === 'partial') { bg='rgba(245,158,11,0.06)'; borderColor='rgba(245,158,11,0.25)'; statusColor='#fbbf24'; statusText='PARTIAL'; icon='🟡'; }
+      let bg='rgba(239,68,68,0.06)', bc='rgba(239,68,68,0.2)', sc='#f87171', st='UNPAID', ic='❌';
+      if(rec && rec.status==='paid')    { bg='rgba(34,197,94,0.06)';  bc='rgba(34,197,94,0.25)';  sc='#4ade80'; st='PAID';    ic='✅'; }
+      if(rec && rec.status==='partial') { bg='rgba(245,158,11,0.06)'; bc='rgba(245,158,11,0.25)'; sc='#fbbf24'; st='PARTIAL'; ic='🟡'; }
     %>
-    <div style="background:<%= bg %>;border:1px solid <%= borderColor %>;border-radius:12px;padding:14px;position:relative;
-                <%= isCurrentMonth ? 'outline:2px solid var(--green);outline-offset:2px' : '' %>">
-      <% if(isCurrentMonth){ %>
-      <div style="position:absolute;top:-8px;right:8px;background:var(--green);color:#fff;font-size:0.62rem;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:0.5px">THIS MONTH</div>
-      <% } %>
-      <div style="font-size:0.78rem;font-weight:700;color:var(--muted);margin-bottom:4px"><%= item.monthName %> <%= item.year %></div>
-      <div style="font-size:1.2rem;margin-bottom:6px"><%= icon %></div>
-      <div style="font-size:0.7rem;font-weight:800;letter-spacing:1px;color:<%= statusColor %>"><%= statusText %></div>
-      <% if(rec && rec.amount){ %>
-      <div style="font-size:0.82rem;font-weight:700;color:var(--text);margin-top:4px">₹<%= rec.amount.toLocaleString('en-IN') %></div>
-      <% } %>
-      <% if(rec && rec.paidAt){ %>
-      <div style="font-size:0.7rem;color:var(--muted);margin-top:2px"><%= new Date(rec.paidAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short'}) %></div>
-      <% } %>
-      <% if(rec && rec.note){ %>
-      <div style="font-size:0.68rem;color:var(--muted);margin-top:4px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="<%= rec.note %>"><%= rec.note %></div>
-      <% } %>
+    <div style="background:<%= bg %>;border:1px solid <%= bc %>;border-radius:12px;padding:14px;position:relative;<%= isNow?'outline:2px solid var(--green);outline-offset:2px':'' %>">
+      <% if(isNow){ %><div style="position:absolute;top:-8px;right:8px;background:var(--green);color:#fff;font-size:0.6rem;font-weight:700;padding:2px 7px;border-radius:10px">NOW</div><% } %>
+      <div style="font-size:0.76rem;font-weight:700;color:var(--muted);margin-bottom:4px"><%= item.monthName %> <%= item.year %></div>
+      <div style="font-size:1.2rem;margin-bottom:4px"><%= ic %></div>
+      <div style="font-size:0.68rem;font-weight:800;letter-spacing:1px;color:<%= sc %>"><%= st %></div>
+      <% if(rec && rec.amount){ %><div style="font-size:0.82rem;font-weight:700;color:var(--text);margin-top:4px">₹<%= rec.amount.toLocaleString('en-IN') %></div><% } %>
+      <% if(rec && rec.paidAt){ %><div style="font-size:0.68rem;color:var(--muted);margin-top:2px"><%= new Date(rec.paidAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short'}) %></div><% } %>
+      <% if(rec && rec.note){ %><div style="font-size:0.66rem;color:var(--muted);margin-top:3px;font-style:italic;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="<%= rec.note %>"><%= rec.note %></div><% } %>
     </div>
     <% }); %>
   </div>
-
-  <!-- Summary row -->
-  <%
-    const paidCount    = last12.filter(i => i.record && i.record.status==='paid').length;
-    const unpaidCount  = last12.filter(i => !i.record || i.record.status==='unpaid').length;
-    const partialCount = last12.filter(i => i.record && i.record.status==='partial').length;
-    const totalPaid    = last12.reduce((a,i) => a + (i.record && i.record.status==='paid' ? i.record.amount : 0), 0);
-  %>
-  <div style="display:flex;gap:16px;margin-top:18px;padding-top:16px;border-top:1px solid var(--border);flex-wrap:wrap">
-    <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:10px;padding:12px 18px;text-align:center">
-      <div style="font-size:1.3rem;font-weight:900;color:var(--green2)"><%= paidCount %></div>
-      <div style="font-size:0.72rem;color:var(--muted)">Months Paid</div>
-    </div>
-    <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:12px 18px;text-align:center">
-      <div style="font-size:1.3rem;font-weight:900;color:#f87171"><%= unpaidCount %></div>
-      <div style="font-size:0.72rem;color:var(--muted)">Months Unpaid</div>
-    </div>
-    <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:12px 18px;text-align:center">
-      <div style="font-size:1.3rem;font-weight:900;color:var(--warn)"><%= partialCount %></div>
-      <div style="font-size:0.72rem;color:var(--muted)">Months Partial</div>
-    </div>
-    <div style="background:rgba(163,230,53,0.08);border:1px solid rgba(163,230,53,0.2);border-radius:10px;padding:12px 18px;text-align:center">
-      <div style="font-size:1.3rem;font-weight:900;color:var(--lime)">₹<%= totalPaid.toLocaleString('en-IN') %></div>
-      <div style="font-size:0.72rem;color:var(--muted)">Total Collected</div>
-    </div>
-  </div>
 </div>
+
+<script>
+function toggleEdit() {
+  const view = document.getElementById('viewMode');
+  const edit = document.getElementById('editMode');
+  const btn  = document.getElementById('editToggleBtn');
+  const isEditing = edit.style.display !== 'none';
+  view.style.display = isEditing ? 'block' : 'none';
+  edit.style.display = isEditing ? 'none'  : 'block';
+  btn.textContent    = isEditing ? '✏️ Edit Details' : '✕ Cancel Edit';
+  btn.style.background = isEditing ? '' : 'rgba(239,68,68,0.15)';
+  btn.style.color      = isEditing ? '' : '#f87171';
+  btn.style.borderColor= isEditing ? '' : 'rgba(239,68,68,0.25)';
+}
+</script>
 
 <%- include('layout-end') %>
