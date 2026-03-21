@@ -147,3 +147,132 @@ textarea { resize: vertical; min-height: 80px; }
   .stats-row { grid-template-columns: 1fr 1fr; }
   .admin-layout { flex-direction: column; }
 }
+
+/* ═══════════════════════════════════════════════
+   ADMIN MOBILE RESPONSIVE FIXES
+═══════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* LAYOUT — sidebar top, main below */
+  .admin-layout { flex-direction: column; }
+
+  .sidebar {
+    position: static;
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-brand { padding: 16px 18px; font-size: 1.1rem; }
+
+  /* Sidebar nav — horizontal scroll row */
+  .sidebar-nav {
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 10px 12px;
+    gap: 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .sidebar-nav::-webkit-scrollbar { display: none; }
+
+  .nav-item {
+    flex-shrink: 0;
+    padding: 8px 14px;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    flex-direction: row;
+    gap: 6px;
+  }
+  .nav-icon { font-size: 0.9rem; width: auto; }
+
+  /* Hide "View Website" and keep logout inline */
+  .sidebar-footer {
+    border-top: none;
+    padding: 0 12px 10px;
+  }
+  .sidebar-footer .nav-item {
+    display: inline-flex;
+    padding: 7px 14px;
+    border-radius: 100px;
+    font-size: 0.78rem;
+  }
+
+  /* MAIN AREA */
+  .main-area { margin-left: 0; padding: 18px 16px; }
+
+  /* TOPBAR */
+  .topbar {
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+  }
+  .topbar-title { font-size: 1.3rem; }
+  .topbar-right { gap: 8px; flex-wrap: wrap; }
+  .topbar-right .btn { font-size: 0.76rem; padding: 7px 12px; }
+
+  /* STATS GRID */
+  .stats-row { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-card  { padding: 16px 14px; }
+  .stat-value { font-size: 1.8rem; }
+  .stat-label { font-size: 0.68rem; }
+
+  /* TABLES — horizontal scroll */
+  .table-card { overflow-x: auto; }
+  table       { min-width: 600px; }
+  th, td      { padding: 10px 12px; font-size: 0.8rem; }
+  .table-header { padding: 14px 16px; flex-wrap: wrap; gap: 8px; }
+
+  /* FILTER BAR */
+  .filter-bar { flex-direction: column; align-items: stretch; }
+  .filter-bar input,
+  .filter-bar select { width: 100%; }
+
+  /* FORM CARDS */
+  .form-card  { padding: 18px 16px; }
+  .form-row2,
+  .form-row3  { grid-template-columns: 1fr; }
+
+  /* DETAIL GRID */
+  .detail-grid { grid-template-columns: 1fr; gap: 10px; }
+
+  /* STUDENT DETAIL top grid */
+  div[style*="grid-template-columns:1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* FEES 12-month grid */
+  div[style*="repeat(4,1fr)"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* BATCH CARDS */
+  div[style*="grid-template-columns:1fr 1fr"][class=""] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* BUTTONS in topbar */
+  .btn { font-size: 0.78rem; padding: 7px 12px; }
+  .btn-solid { padding: 10px 16px; }
+
+  /* Fees stats row */
+  .stats-row[style*="repeat(5,1fr)"] {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .main-area { padding: 14px 12px; }
+  .topbar-title { font-size: 1.15rem; }
+
+  /* Fee grid 2 col on small phones */
+  div[style*="repeat(4,1fr)"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .stats-row[style*="repeat(5,1fr)"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}

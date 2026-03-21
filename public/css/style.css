@@ -388,3 +388,81 @@ footer {
   footer { padding: 40px 20px 28px; }
   .hero-title { letter-spacing: -1.5px; }
 }
+
+/* ═══════════════════════════════════════════════
+   MOBILE RESPONSIVE FIXES
+═══════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* NAV */
+  .navbar {
+    padding: 14px 18px;
+    flex-wrap: nowrap;
+  }
+  .navbar-brand { font-size: 1.15rem; gap: 8px; }
+  .brand-icon   { width: 34px; height: 34px; font-size: 1rem; }
+  .btn-nav      { padding: 8px 14px; font-size: 0.8rem; white-space: nowrap; }
+
+  /* HERO */
+  .hero         { padding: 100px 18px 60px; }
+  .hero-eyebrow {
+    font-size: 0.65rem; padding: 5px 12px;
+    letter-spacing: 1px; text-align: center;
+    white-space: normal; max-width: 280px;
+  }
+  .hero-title   { font-size: 2.6rem; letter-spacing: -1px; }
+  .hero-desc    { font-size: 0.92rem; margin: 18px auto 28px; }
+  .hero-ctas    { flex-direction: column; align-items: center; gap: 10px; }
+  .btn-primary,
+  .btn-outline  { width: 100%; max-width: 300px; text-align: center; padding: 14px 20px; }
+
+  /* STATS */
+  .hero-stats   { gap: 10px; margin-top: 40px; }
+  .stat-box     { padding: 14px 16px; flex: 1; min-width: 70px; }
+  .stat-num     { font-size: 1.4rem; }
+  .stat-lbl     { font-size: 0.62rem; }
+
+  /* SECTIONS */
+  .section, .section-sm { padding: 50px 18px; }
+  .sec-title    { font-size: 1.8rem; letter-spacing: -0.5px; }
+
+  /* ABOUT */
+  .about-grid   { grid-template-columns: 1fr; gap: 24px; }
+  .teacher-card { padding: 28px 22px; }
+  .dna-icon     { width: 56px; height: 56px; font-size: 1.8rem; }
+  .teacher-name { font-size: 1.6rem; }
+
+  /* TOPICS */
+  .topics-grid  { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .topic-card   { padding: 18px 14px; }
+  .topic-emoji  { font-size: 1.6rem; margin-bottom: 8px; }
+  .topic-title  { font-size: 0.88rem; }
+  .topic-desc   { font-size: 0.74rem; }
+
+  /* SCHEDULE */
+  .schedule-grid { grid-template-columns: 1fr; gap: 16px; }
+
+  /* ENROLL */
+  .enroll-box   { grid-template-columns: 1fr; }
+  .enroll-left, .enroll-right { padding: 28px 20px; }
+  .form-row2    { grid-template-columns: 1fr; }
+
+  /* TESTIMONIALS */
+  .testi-grid   { grid-template-columns: 1fr; gap: 14px; }
+
+  /* CONTACT */
+  .contact-grid { grid-template-columns: 1fr; gap: 16px; }
+
+  /* FOOTER */
+  footer        { padding: 40px 18px 28px; }
+  .footer-grid  { grid-template-columns: 1fr; gap: 28px; }
+  .footer-bottom { flex-direction: column; gap: 14px; text-align: center; }
+}
+
+@media (max-width: 420px) {
+  .hero-title   { font-size: 2.1rem; }
+  .hero-stats   { grid-template-columns: 1fr 1fr; display: grid; gap: 10px; }
+  .stat-box     { padding: 12px 10px; }
+  .topics-grid  { grid-template-columns: 1fr; }
+  .hero-eyebrow { font-size: 0.6rem; letter-spacing: 0.5px; }
+}
