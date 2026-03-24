@@ -1,0 +1,43 @@
+<section class="admin-panel">
+  <div class="panel-head">
+    <h2>Enrollment Requests</h2>
+    <span class="panel-count"><%= enrollments.length %> leads</span>
+  </div>
+
+  <% if (!enrollments.length) { %>
+    <article class="card">
+      <p class="muted">No enrollment requests yet.</p>
+    </article>
+  <% } else { %>
+    <div class="stack">
+      <% enrollments.forEach((enrollment) => { %>
+        <article class="item-card">
+          <div class="space-between">
+            <div>
+              <h3><%= enrollment.fullName %> (Class <%= enrollment.classLevel %>)</h3>
+              <p class="muted">Guardian: <%= enrollment.guardianName %> | Phone: <%= enrollment.phone %></p>
+            </div>
+            <p class="muted"><%= new Date(enrollment.createdAt).toLocaleString() %></p>
+          </div>
+          <% if (enrollment.message) { %>
+            <p><%= enrollment.message %></p>
+          <% } %>
+
+          <form method="post" action="/admin/enrollments/<%= enrollment._id %>/status?_method=PATCH" class="inline-form">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <label>
+              Status
+              <select name="status">
+                <option value="new" <%= enrollment.status === 'new' ? 'selected' : '' %>>New</option>
+                <option value="contacted" <%= enrollment.status === 'contacted' ? 'selected' : '' %>>Contacted</option>
+                <option value="converted" <%= enrollment.status === 'converted' ? 'selected' : '' %>>Converted</option>
+                <option value="rejected" <%= enrollment.status === 'rejected' ? 'selected' : '' %>>Rejected</option>
+              </select>
+            </label>
+            <button class="btn btn-secondary" type="submit">Update Status</button>
+          </form>
+        </article>
+      <% }) %>
+    </div>
+  <% } %>
+</section>

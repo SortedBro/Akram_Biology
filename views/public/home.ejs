@@ -1,0 +1,325 @@
+<% const c9 = countsMap['9'] || { chapters: 0, files: 0 }; %>
+<% const c10 = countsMap['10'] || { chapters: 0, files: 0 }; %>
+<% const c11 = countsMap['11'] || { chapters: 0, files: 0 }; %>
+<% const c12 = countsMap['12'] || { chapters: 0, files: 0 }; %>
+
+<nav class="nav">
+  <div class="nav-brand">
+    <div class="dna-icon">&#x1F9EC;</div>
+    <span>Akram's Bio-Care</span>
+  </div>
+  <div class="nav-links">
+    <a class="nav-link active" href="/"><span class="nl-icon">&#x1F3E0;</span> Home</a>
+    <a class="nav-link" href="/notes"><span class="nl-icon">&#x1F4DA;</span> Notes</a>
+    <a class="nav-link" href="#enroll"><span class="nl-icon">&#x270D;&#xFE0F;</span> Enroll</a>
+    <a class="nav-link" href="#contact"><span class="nl-icon">&#x1F4DE;</span> Contact</a>
+    <div class="nav-sep"></div>
+    <a class="nav-link" href="/admin/login"><span class="nl-icon">&#x1F510;</span> Admin</a>
+  </div>
+  <div class="nav-right">
+    <span class="admin-pill">ADMIN MODE</span>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid-lines"></div>
+  <div class="hero-particles" id="heroParticles"></div>
+
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-eyebrow">Biology Coaching Centre</div>
+      <h1 class="hero-title">
+        <span class="t1">Akram's</span>
+        <span class="t2">Bio-Care</span>
+      </h1>
+      <p class="hero-sub">A Complete Guide of Biology from fundamentals to exam-level mastery. Chapter-wise support for Class IX-XII.</p>
+
+      <div class="hero-teacher">
+        <div class="teacher-avatar">&#x1F468;&#x200D;&#x1F3EB;</div>
+        <div class="teacher-info">
+          <div class="t-name">Md. Akram Raja</div>
+          <div class="t-quals">BSc Zoology Hons - MSc - BLIS - MLIS - D.El.Ed - B.Ed (Pursuing)</div>
+        </div>
+      </div>
+
+      <div class="hero-badges">
+        <span class="hbadge hb-g">WBCHSE</span>
+        <span class="hbadge hb-v">WBBSE</span>
+        <span class="hbadge hb-go">NEET Prep</span>
+        <span class="hbadge hb-c">Biology Practical</span>
+      </div>
+
+      <div class="hero-cta">
+        <a class="btn btn-green" href="#enroll">Enroll Now</a>
+        <a class="btn btn-outline" href="/notes">Browse Notes</a>
+        <a class="btn btn-outline" href="#contact">Contact Us</a>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="stat-bubble">
+        <div class="sb-num">4+</div>
+        <div class="sb-lbl">Classes (IX-XII)</div>
+      </div>
+      <div class="stat-bubble">
+        <div class="sb-num"><%= c9.chapters + c10.chapters + c11.chapters + c12.chapters %></div>
+        <div class="sb-lbl">Total Chapters</div>
+      </div>
+      <div class="stat-bubble">
+        <div class="sb-num"><%= c9.files + c10.files + c11.files + c12.files %></div>
+        <div class="sb-lbl">Uploaded Files</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="info-strip">
+  <div class="info-strip-item"><span class="is-icon">&#x1F4CD;</span> Lohapur Old Post Office Gali</div>
+  <div class="info-strip-item"><span class="is-icon">&#x1F4CD;</span> Bhadrapur Near Fashion House</div>
+  <div class="info-strip-item"><span class="is-icon">&#x1F4DE;</span> <a href="tel:9609353839">9609353839</a></div>
+  <div class="info-strip-item"><span class="is-icon">&#x2709;&#xFE0F;</span> <a href="mailto:akramraja403@gmail.com">akramraja403@gmail.com</a></div>
+</div>
+
+<div class="s-wrap">
+  <div class="s-head">
+    <div class="s-label">Our Batches</div>
+    <div class="s-title">Available <em>Classes</em></div>
+  </div>
+  <div class="classes-grid">
+    <a class="cls-card c9" href="/notes?class=9">
+      <div class="cls-num">IX</div>
+      <div class="cls-name">Class Nine</div>
+      <div class="cls-board"><%= c9.chapters %> chapters / <%= c9.files %> files</div>
+      <div class="cls-arrow">-></div>
+    </a>
+    <a class="cls-card c10" href="/notes?class=10">
+      <div class="cls-num">X</div>
+      <div class="cls-name">Class Ten</div>
+      <div class="cls-board"><%= c10.chapters %> chapters / <%= c10.files %> files</div>
+      <div class="cls-arrow">-></div>
+    </a>
+    <a class="cls-card c11" href="/notes?class=11">
+      <div class="cls-num">XI</div>
+      <div class="cls-name">Class Eleven</div>
+      <div class="cls-board"><%= c11.chapters %> chapters / <%= c11.files %> files</div>
+      <div class="cls-arrow">-></div>
+    </a>
+    <a class="cls-card c12" href="/notes?class=12">
+      <div class="cls-num">XII</div>
+      <div class="cls-name">Class Twelve</div>
+      <div class="cls-board"><%= c12.chapters %> chapters / <%= c12.files %> files</div>
+      <div class="cls-arrow">-></div>
+    </a>
+  </div>
+</div>
+
+<div class="home-divider"></div>
+
+<div class="s-wrap">
+  <div class="s-head">
+    <div class="s-label">Why Choose Us</div>
+    <div class="s-title">Our <em>Speciality</em></div>
+  </div>
+  <div class="spec-grid">
+    <div class="spec-card"><div class="spec-icon-wrap">&#x1F58B;&#xFE0F;</div><div class="spec-title">Chapterwise Concept Class</div><div class="spec-desc">Concept clearing for every chapter in detail.</div></div>
+    <div class="spec-card"><div class="spec-icon-wrap">&#x1F64B;</div><div class="spec-title">Remedial & Doubt Clearing</div><div class="spec-desc">Dedicated sessions to resolve individual doubts.</div></div>
+    <div class="spec-card"><div class="spec-icon-wrap">&#x1F4DD;</div><div class="spec-title">Informative Notes</div><div class="spec-desc">Exam-focused notes with diagrams and key points.</div></div>
+    <div class="spec-card"><div class="spec-icon-wrap">&#x1F4CB;</div><div class="spec-title">Daily Home Task</div><div class="spec-desc">Practice assignments after every class.</div></div>
+    <div class="spec-card"><div class="spec-icon-wrap">&#x1F4CA;</div><div class="spec-title">Chapter-wise Test</div><div class="spec-desc">Regular tests to track progress and gaps.</div></div>
+    <div class="spec-card"><div class="spec-icon-wrap">&#x1F4C6;</div><div class="spec-title">Pre-Board Prep</div><div class="spec-desc">Structured revision and mock test strategy.</div></div>
+    <div class="spec-card"><div class="spec-icon-wrap">&#x1F4F1;</div><div class="spec-title">Parent WhatsApp Updates</div><div class="spec-desc">Progress updates shared with parents.</div></div>
+    <div class="spec-card"><div class="spec-icon-wrap">&#x1F9EA;</div><div class="spec-title">Standard Practical</div><div class="spec-desc">Hands-on practical guidance with proper standards.</div></div>
+  </div>
+</div>
+
+<div class="home-divider"></div>
+
+<div class="s-wrap s-wrap no-top">
+  <div class="s-head">
+    <div class="s-label">Announcements</div>
+    <div class="s-title">Notice <em>Board</em></div>
+  </div>
+  <div class="notice-board">
+    <div class="notice-content">
+      <div>
+        <div class="notice-title">New Biology Batch Starting Soon</div>
+        <p class="notice-text">Upcoming classes are opening with limited seats. Enroll early to reserve your place.</p>
+        <br />
+        <a class="btn btn-green" href="#enroll">Reserve Your Seat -></a>
+      </div>
+      <ul class="notice-list">
+        <li><span class="nli">&#x1F4CC;</span> Class XI batch - Theory + Practical</li>
+        <li><span class="nli">&#x1F4CC;</span> Class IX & X - board standard</li>
+        <li><span class="nli">&#x1F4CC;</span> Class XII - board + NEET prep</li>
+        <li><span class="nli">&#x1F4CC;</span> Small batches for personal attention</li>
+        <li><span class="nli">&#x1F4DE;</span> Call 9609353839 for details</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="page active" id="enroll">
+  <div class="enroll-wrap">
+    <div class="enroll-left">
+      <h2>Student Enrollment</h2>
+      <p class="el-sub">Fill in the form below to enroll at Akram's Bio-Care. We will contact you soon.</p>
+
+      <form class="form-card" method="post" action="/enroll">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+        <div class="form-divider"><span>Personal Information</span></div>
+        <div class="form-row">
+          <div class="fg"><label>Student Name <span class="req">*</span></label><input type="text" name="fullName" placeholder="Full name of student" required /></div>
+          <div class="fg"><label>Date of Birth</label><input type="date" name="dob" /></div>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>Guardian Name <span class="req">*</span></label><input type="text" name="guardianName" placeholder="Father / Mother name" required /></div>
+          <div class="fg"><label>Relation</label><select name="relation"><option value="">Select</option><option>Father</option><option>Mother</option><option>Other</option></select></div>
+        </div>
+
+        <div class="form-divider"><span>Academic Details</span></div>
+        <div class="form-row">
+          <div class="fg"><label>Class <span class="req">*</span></label><select name="classLevel" required><option value="">Select class</option><option value="9">Class IX</option><option value="10">Class X</option><option value="11">Class XI</option><option value="12">Class XII</option></select></div>
+          <div class="fg"><label>Board</label><select name="board"><option value="">Select board</option><option>WBBSE</option><option>WBCHSE</option><option>NEET Preparation</option></select></div>
+        </div>
+        <div class="form-row span1">
+          <div class="fg"><label>Previous School / Institution</label><input type="text" name="schoolName" placeholder="Name of previous school" /></div>
+        </div>
+
+        <div class="form-divider"><span>Contact Details</span></div>
+        <div class="form-row">
+          <div class="fg"><label>Phone Number <span class="req">*</span></label><input type="tel" name="phone" placeholder="10-digit mobile number" required /></div>
+          <div class="fg"><label>WhatsApp Number</label><input type="tel" name="whatsapp" placeholder="WhatsApp (if different)" /></div>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>Email Address</label><input type="email" name="email" placeholder="Email (optional)" /></div>
+          <div class="fg"><label>Address</label><input type="text" name="address" placeholder="Village / Town, District" /></div>
+        </div>
+
+        <div class="form-divider"><span>Additional Info</span></div>
+        <div class="form-row span1">
+          <div class="fg"><label>Message / Requirements</label><textarea name="message" placeholder="Any special requirements, questions about batches, or extra information..."></textarea></div>
+        </div>
+
+        <button class="form-submit" type="submit">Submit Enrollment Request</button>
+      </form>
+    </div>
+
+    <div class="enroll-right">
+      <div class="er-card">
+        <h3>Fee Structure</h3>
+        <table class="fee-table">
+          <tr><td>Class IX</td><td>Rs 500 / month</td></tr>
+          <tr><td>Class X</td><td>Rs 550 / month</td></tr>
+          <tr><td>Class XI</td><td>Rs 600 / month</td></tr>
+          <tr><td>Class XII</td><td>Rs 700 / month</td></tr>
+          <tr><td>NEET Prep</td><td>Rs 800 / month</td></tr>
+        </table>
+      </div>
+      <div class="er-card">
+        <h3>Why Join Us?</h3>
+        <ul class="why-list">
+          <li><span class="wi">-></span>Chapterwise WBCHSE & NCERT clearing</li>
+          <li><span class="wi">-></span>Dedicated doubt clearing sessions</li>
+          <li><span class="wi">-></span>Detailed informative notes</li>
+          <li><span class="wi">-></span>Daily home tasks</li>
+          <li><span class="wi">-></span>Chapter-wise class tests</li>
+          <li><span class="wi">-></span>Pre-board exam preparation</li>
+          <li><span class="wi">-></span>Parent updates via WhatsApp</li>
+          <li><span class="wi">-></span>Standard biology practicals</li>
+          <li><span class="wi">-></span>Small batch for personal attention</li>
+        </ul>
+      </div>
+      <div class="er-card">
+        <h3>Quick Contact</h3>
+        <ul class="why-list">
+          <li><span class="wi">&#x1F4DE;</span><a href="tel:9609353839" style="color:var(--green);text-decoration:none">9609353839</a></li>
+          <li><span class="wi">&#x2709;&#xFE0F;</span><a href="mailto:akramraja403@gmail.com" style="color:var(--green);text-decoration:none;font-size:0.78rem">akramraja403@gmail.com</a></li>
+          <li><span class="wi">&#x1F4CD;</span>Lohapur Old Post Office Gali</li>
+          <li><span class="wi">&#x1F4CD;</span>Bhadrapur Near Fashion House</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page active" id="contact">
+  <div class="contact-wrap">
+    <div class="s-head">
+      <div class="s-label">Reach Out</div>
+      <div class="s-title">Contact <em>Us</em></div>
+    </div>
+
+    <div class="contact-grid">
+      <div class="contact-card">
+        <div class="contact-card-top">
+          <div class="cc-icon cci-green">&#x1F4CD;</div>
+          <div><div class="cc-title">Location 1 - Lohapur</div><div class="cc-sub">For Lohapur Area Students</div></div>
+        </div>
+        <p>Old Post Office Gali, Lohapur</p>
+        <div class="map-box"><div class="map-icon">&#x1F5FA;&#xFE0F;</div><span>Lohapur Old Post Office Gali</span></div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-card-top">
+          <div class="cc-icon cci-gold">&#x1F4CD;</div>
+          <div><div class="cc-title">Location 2 - Bhadrapur</div><div class="cc-sub">For Bhadrapur Area Students</div></div>
+        </div>
+        <p>Near Fashion House, Bhadrapur Bus Stand</p>
+        <div class="map-box"><div class="map-icon">&#x1F5FA;&#xFE0F;</div><span>Bhadrapur Bus Stand Near Fashion House</span></div>
+      </div>
+      <div class="contact-card">
+        <div class="contact-card-top">
+          <div class="cc-icon cci-violet">&#x1F4DE;</div>
+          <div><div class="cc-title">Phone & WhatsApp</div><div class="cc-sub">Mon - Sat, 9am - 7pm</div></div>
+        </div>
+        <p><a href="tel:9609353839">9609353839</a><br /><br />Available for calls and WhatsApp messages during teaching hours.</p>
+      </div>
+      <div class="contact-card">
+        <div class="contact-card-top">
+          <div class="cc-icon cci-cyan">&#x2709;&#xFE0F;</div>
+          <div><div class="cc-title">Email</div><div class="cc-sub">Response within 24 hours</div></div>
+        </div>
+        <p><a href="mailto:akramraja403@gmail.com">akramraja403@gmail.com</a><br /><br />For enrollment queries, notes requests, fee information, and general questions.</p>
+      </div>
+    </div>
+
+    <div class="s-head" style="margin-top:8px">
+      <div class="s-label">Direct Message</div>
+      <div class="s-title">Send a <em>Message</em></div>
+    </div>
+
+    <div class="contact-form-wrap">
+      <form class="form-card" method="post" action="/contact">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <div class="form-row">
+          <div class="fg"><label>Your Name <span class="req">*</span></label><input type="text" name="fullName" placeholder="Full name" required /></div>
+          <div class="fg"><label>Phone / WhatsApp <span class="req">*</span></label><input type="tel" name="phone" placeholder="Contact number" required /></div>
+        </div>
+        <div class="form-row span1">
+          <div class="fg"><label>Class Interested In</label><select name="classLevel"><option value="">Select (optional)</option><option value="9">Class IX</option><option value="10">Class X</option><option value="11">Class XI</option><option value="12">Class XII</option></select></div>
+        </div>
+        <div class="form-row span1">
+          <div class="fg"><label>Your Message <span class="req">*</span></label><textarea name="message" placeholder="Write your question, query, or message here..." style="min-height:120px" required></textarea></div>
+        </div>
+        <button class="form-submit" type="submit">Send Message</button>
+      </form>
+
+      <div>
+        <div class="contact-hours">
+          <div class="ch-title">Teaching Hours</div>
+          <div class="hours-grid">
+            <div class="hour-item"><div class="h-day">Monday</div><div class="h-time">7:00 AM - 8:30 PM</div></div>
+            <div class="hour-item"><div class="h-day">Tuesday</div><div class="h-time">7:00 AM - 8:30 PM</div></div>
+            <div class="hour-item"><div class="h-day">Wednesday</div><div class="h-time">7:00 AM - 8:30 PM</div></div>
+            <div class="hour-item"><div class="h-day">Thursday</div><div class="h-time">7:00 AM - 8:30 PM</div></div>
+            <div class="hour-item"><div class="h-day">Friday</div><div class="h-time">7:00 AM - 8:30 PM</div></div>
+            <div class="hour-item"><div class="h-day">Saturday</div><div class="h-time">7:00 AM - 6:00 PM</div></div>
+            <div class="hour-item"><div class="h-day">Sunday</div><div class="h-time">By appointment</div></div>
+            <div class="hour-item"><div class="h-day">Holidays</div><div class="h-time">Call ahead</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

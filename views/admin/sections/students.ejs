@@ -1,0 +1,154 @@
+<section class="admin-panel">
+  <div class="panel-head">
+    <h2>Students</h2>
+    <span class="panel-count"><%= students.length %> records</span>
+  </div>
+
+  <div class="admin-grid-2">
+    <article class="card">
+      <h3>Add Student</h3>
+      <form class="grid cols-3 form-grid" method="post" action="/admin/students">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <label>
+          Name *
+          <input type="text" name="fullName" required />
+        </label>
+        <label>
+          Class *
+          <select name="classLevel" required>
+            <option value="">Select class</option>
+            <option value="9">Class 9</option>
+            <option value="10">Class 10</option>
+            <option value="11">Class 11</option>
+            <option value="12">Class 12</option>
+          </select>
+        </label>
+        <label>
+          Phone *
+          <input type="text" name="phone" required />
+        </label>
+        <label>
+          Guardian
+          <input type="text" name="guardianName" />
+        </label>
+        <label>
+          Board
+          <input type="text" name="board" />
+        </label>
+        <label>
+          Status
+          <select name="status">
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </label>
+        <label class="full">
+          Address
+          <textarea name="address" rows="2"></textarea>
+        </label>
+        <div class="full">
+          <button type="submit" class="btn">Add Student</button>
+        </div>
+      </form>
+    </article>
+
+    <article class="card">
+      <h3>Directory</h3>
+      <% if (!students.length) { %>
+        <p class="muted">No students yet.</p>
+      <% } else { %>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Class</th>
+                <th>Phone</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% students.forEach((student) => { %>
+                <tr>
+                  <td><%= student.fullName %></td>
+                  <td><%= student.classLevel %></td>
+                  <td><%= student.phone %></td>
+                  <td><span class="pill <%= student.status === 'active' ? 'p-active' : 'p-inactive' %>"><%= student.status %></span></td>
+                  <td><a href="#student-<%= student._id %>" class="table-link">Edit</a></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </article>
+  </div>
+
+  <div class="stack">
+    <% students.forEach((student) => { %>
+      <details class="editor-card" id="student-<%= student._id %>">
+        <summary>
+          <span><strong><%= student.fullName %></strong> (Class <%= student.classLevel %>)</span>
+          <span class="muted">Edit student</span>
+        </summary>
+        <div class="editor-body">
+          <form method="post" action="/admin/students/<%= student._id %>?_method=PATCH" class="grid cols-4 form-grid">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <label>
+              Name
+              <input type="text" name="fullName" value="<%= student.fullName %>" required />
+            </label>
+            <label>
+              Class
+              <select name="classLevel" required>
+                <option value="9" <%= student.classLevel === '9' ? 'selected' : '' %>>9</option>
+                <option value="10" <%= student.classLevel === '10' ? 'selected' : '' %>>10</option>
+                <option value="11" <%= student.classLevel === '11' ? 'selected' : '' %>>11</option>
+                <option value="12" <%= student.classLevel === '12' ? 'selected' : '' %>>12</option>
+              </select>
+            </label>
+            <label>
+              Phone
+              <input type="text" name="phone" value="<%= student.phone %>" required />
+            </label>
+            <label>
+              Status
+              <select name="status">
+                <option value="active" <%= student.status === 'active' ? 'selected' : '' %>>Active</option>
+                <option value="inactive" <%= student.status === 'inactive' ? 'selected' : '' %>>Inactive</option>
+              </select>
+            </label>
+            <label>
+              Guardian
+              <input type="text" name="guardianName" value="<%= student.guardianName || '' %>" />
+            </label>
+            <label>
+              Board
+              <input type="text" name="board" value="<%= student.board || '' %>" />
+            </label>
+            <label>
+              WhatsApp
+              <input type="text" name="whatsapp" value="<%= student.whatsapp || '' %>" />
+            </label>
+            <label>
+              Email
+              <input type="email" name="email" value="<%= student.email || '' %>" />
+            </label>
+            <label class="full">
+              Address
+              <textarea name="address" rows="2"><%= student.address || '' %></textarea>
+            </label>
+            <div class="btn-row full">
+              <button type="submit" class="btn">Save Changes</button>
+            </div>
+          </form>
+          <form method="post" action="/admin/students/<%= student._id %>?_method=DELETE">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <button type="submit" class="btn btn-danger js-confirm" data-confirm="Delete this student?">Delete Student</button>
+          </form>
+        </div>
+      </details>
+    <% }) %>
+  </div>
+</section>

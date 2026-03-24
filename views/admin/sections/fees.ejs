@@ -1,0 +1,98 @@
+<section class="admin-panel">
+  <div class="panel-head">
+    <h2>Fees</h2>
+    <span class="panel-count"><%= fees.length %> records</span>
+  </div>
+
+  <article class="card">
+    <h3>Create Fee Record</h3>
+    <form class="grid cols-4 form-grid" method="post" action="/admin/fees">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      <label>
+        Student *
+        <select name="student" required>
+          <option value="">Select student</option>
+          <% students.forEach((student) => { %>
+            <option value="<%= student._id %>"><%= student.fullName %> (Class <%= student.classLevel %>)</option>
+          <% }) %>
+        </select>
+      </label>
+      <label>
+        Month *
+        <input type="month" name="month" required />
+      </label>
+      <label>
+        Amount *
+        <input type="number" name="amount" min="0" step="0.01" required />
+      </label>
+      <label>
+        Status
+        <select name="status">
+          <option value="due">Due</option>
+          <option value="partial">Partial</option>
+          <option value="paid">Paid</option>
+        </select>
+      </label>
+      <label class="full">
+        Note
+        <input type="text" name="note" />
+      </label>
+      <div class="full">
+        <button type="submit" class="btn">Add Fee</button>
+      </div>
+    </form>
+  </article>
+
+  <div class="stack">
+    <% fees.forEach((fee) => { %>
+      <details class="editor-card">
+        <summary>
+          <span><strong><%= fee.student?.fullName || 'Unknown Student' %></strong> - <%= fee.month %> - Rs <%= fee.amount %></span>
+          <span class="pill <%= fee.status === 'paid' ? 'p-active' : 'p-inactive' %>"><%= fee.status %></span>
+        </summary>
+        <div class="editor-body">
+          <form method="post" action="/admin/fees/<%= fee._id %>?_method=PATCH" class="grid cols-4 form-grid">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <label>
+              Student
+              <select name="student" required>
+                <% students.forEach((student) => { %>
+                  <option value="<%= student._id %>" <%= String(fee.student?._id) === String(student._id) ? 'selected' : '' %>>
+                    <%= student.fullName %> (Class <%= student.classLevel %>)
+                  </option>
+                <% }) %>
+              </select>
+            </label>
+            <label>
+              Month
+              <input type="month" name="month" value="<%= fee.month %>" required />
+            </label>
+            <label>
+              Amount
+              <input type="number" name="amount" min="0" step="0.01" value="<%= fee.amount %>" required />
+            </label>
+            <label>
+              Status
+              <select name="status">
+                <option value="due" <%= fee.status === 'due' ? 'selected' : '' %>>Due</option>
+                <option value="partial" <%= fee.status === 'partial' ? 'selected' : '' %>>Partial</option>
+                <option value="paid" <%= fee.status === 'paid' ? 'selected' : '' %>>Paid</option>
+              </select>
+            </label>
+            <label class="full">
+              Note
+              <input type="text" name="note" value="<%= fee.note || '' %>" />
+            </label>
+            <div class="btn-row full">
+              <button type="submit" class="btn">Save Changes</button>
+            </div>
+          </form>
+          <form method="post" action="/admin/fees/<%= fee._id %>?_method=DELETE">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <button type="submit" class="btn btn-danger js-confirm" data-confirm="Delete this fee record?">Delete Fee</button>
+          </form>
+        </div>
+      </details>
+    <% }) %>
+  </div>
+</section>

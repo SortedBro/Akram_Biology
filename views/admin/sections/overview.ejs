@@ -1,0 +1,74 @@
+<section class="admin-panel">
+  <div class="panel-head">
+    <h2>Platform Summary</h2>
+    <span class="panel-count"><%= stats.totalBatches %> batches • <%= stats.totalChapters %> chapters</span>
+  </div>
+
+  <div class="admin-grid-2">
+    <article class="card">
+      <h3>Recent Students</h3>
+      <% if (!overview.recentStudents.length) { %>
+        <p class="muted">No students yet.</p>
+      <% } else { %>
+        <ul class="overview-list">
+          <% overview.recentStudents.forEach((student) => { %>
+            <li>
+              <strong><%= student.fullName %></strong>
+              <span class="muted">Class <%= student.classLevel %> • <%= student.phone %></span>
+            </li>
+          <% }) %>
+        </ul>
+      <% } %>
+    </article>
+
+    <article class="card">
+      <h3>Recent Messages</h3>
+      <% if (!overview.recentMessages.length) { %>
+        <p class="muted">No messages yet.</p>
+      <% } else { %>
+        <ul class="overview-list">
+          <% overview.recentMessages.forEach((message) => { %>
+            <li>
+              <strong><%= message.fullName %></strong>
+              <span class="muted"><%= message.phone %> • <%= message.isRead ? 'Read' : 'Unread' %></span>
+            </li>
+          <% }) %>
+        </ul>
+      <% } %>
+    </article>
+  </div>
+
+  <div class="admin-grid-2">
+    <article class="card">
+      <h3>Recent Enrollment Leads</h3>
+      <% if (!overview.recentEnrollments.length) { %>
+        <p class="muted">No enrollment requests yet.</p>
+      <% } else { %>
+        <ul class="overview-list">
+          <% overview.recentEnrollments.forEach((lead) => { %>
+            <li>
+              <strong><%= lead.fullName %></strong>
+              <span class="muted">Class <%= lead.classLevel %> • <%= lead.status %></span>
+            </li>
+          <% }) %>
+        </ul>
+      <% } %>
+    </article>
+
+    <article class="card">
+      <h3>Recently Updated Chapters</h3>
+      <% if (!overview.recentChapters.length) { %>
+        <p class="muted">No chapter updates yet.</p>
+      <% } else { %>
+        <ul class="overview-list">
+          <% overview.recentChapters.forEach((chapter) => { %>
+            <li>
+              <strong><%= chapter.title %></strong>
+              <span class="muted">Class <%= chapter.classLevel %> • <%= chapter.files.length %> files</span>
+            </li>
+          <% }) %>
+        </ul>
+      <% } %>
+    </article>
+  </div>
+</section>

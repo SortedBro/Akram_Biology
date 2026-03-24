@@ -1,0 +1,39 @@
+<section class="admin-panel">
+  <div class="panel-head">
+    <h2>Contact Messages</h2>
+    <span class="panel-count"><%= messages.length %> messages</span>
+  </div>
+
+  <% if (!messages.length) { %>
+    <article class="card">
+      <p class="muted">No messages yet.</p>
+    </article>
+  <% } else { %>
+    <div class="stack">
+      <% messages.forEach((message) => { %>
+        <article class="item-card <%= message.isRead ? '' : 'unread' %>">
+          <div class="space-between">
+            <div>
+              <h3><%= message.fullName %></h3>
+              <p class="muted"><%= message.phone %> | Class <%= message.classLevel || '-' %></p>
+            </div>
+            <p class="muted"><%= new Date(message.createdAt).toLocaleString() %></p>
+          </div>
+          <p><%= message.message %></p>
+          <div class="btn-row">
+            <% if (!message.isRead) { %>
+              <form method="post" action="/admin/messages/<%= message._id %>?_method=PATCH">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                <button class="btn btn-secondary" type="submit">Mark as Read</button>
+              </form>
+            <% } %>
+            <form method="post" action="/admin/messages/<%= message._id %>?_method=DELETE">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+              <button class="btn btn-danger btn-sm js-confirm" data-confirm="Delete this message?" type="submit">Delete</button>
+            </form>
+          </div>
+        </article>
+      <% }) %>
+    </div>
+  <% } %>
+</section>

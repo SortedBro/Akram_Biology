@@ -1,156 +1,110 @@
-# 🧬 Akram Biology — Full Stack Web App
+# Akram Bio-Care (Production-Grade)
 
-**Node.js + Express + MongoDB + EJS**
+This project is a production-ready conversion of a static `index.html` into a full stack application using:
 
-Offline tuition website for Akram Biology, Malda, West Bengal.
+- Node.js
+- Express.js
+- MongoDB (Mongoose)
+- EJS templates
 
----
+## Features
 
-## 📁 Project Structure
+- Public pages:
+  - Home page with active batch listing
+  - Class-wise notes page
+  - Enrollment form (stored in MongoDB)
+  - Contact form (stored in MongoDB)
+- Admin panel:
+  - Secure login/logout using session auth
+  - Students CRUD
+  - Batches CRUD
+  - Fees CRUD
+  - Chapter management
+  - Notes file upload (PDF/Image)
+  - Contact messages read/delete
+  - Enrollment status management
+- Production hardening:
+  - Helmet
+  - Rate limiting
+  - Mongo sanitization
+  - XSS clean + HPP
+  - CSRF protection
+  - Flash messages + central error handler
+
+## Project Structure
 
 ```
-akram-biology/
-├── server.js              ← Main entry point
-├── package.json
-├── .env.example           ← Copy to .env and fill in your values
-├── config/
-│   ├── db.js              ← MongoDB connection + seed data
-│   └── mailer.js          ← Nodemailer email helper
-├── middleware/
-│   └── auth.js            ← Admin session protection
-├── models/
-│   └── index.js           ← Student, Batch, Contact, Admin schemas
-├── routes/
-│   ├── public.js          ← Home, Enroll, Contact routes
-│   └── admin.js           ← All /admin/* routes
-├── views/
-│   ├── home.ejs           ← Homepage
-│   ├── enroll.ejs         ← Enrollment form page
-│   ├── 404.ejs
-│   ├── partials/
-│   │   ├── head.ejs
-│   │   ├── navbar.ejs
-│   │   └── footer.ejs
-│   └── admin/
-│       ├── login.ejs
-│       ├── dashboard.ejs
-│       ├── students.ejs
-│       ├── student-detail.ejs
-│       ├── batches.ejs
-│       ├── messages.ejs
-│       ├── layout-start.ejs
-│       └── layout-end.ejs
-└── public/
-    ├── css/
-    │   ├── style.css      ← Public website styles
-    │   └── admin.css      ← Admin panel styles
-    └── js/                ← (add custom scripts here)
+.
+|-- public/
+|   |-- css/main.css
+|   |-- js/main.js
+|   `-- uploads/
+|-- scripts/seedAdmin.js
+|-- src/
+|   |-- app.js
+|   |-- server.js
+|   |-- config/
+|   |-- controllers/
+|   |-- middleware/
+|   |-- models/
+|   |-- routes/
+|   `-- utils/
+|-- views/
+|   |-- admin/
+|   |-- public/
+|   |-- partials/
+|   `-- errors/
+|-- .env.example
+`-- package.json
 ```
 
----
+## Setup
 
-## 🚀 Setup Instructions
+1. Install dependencies:
 
-### 1. Prerequisites
-- Node.js v18+ installed
-- MongoDB running locally OR MongoDB Atlas URI
-
-### 2. Install dependencies
 ```bash
-cd akram-biology
 npm install
 ```
 
-### 3. Configure environment
+2. Create env file:
+
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env`:
-```env
-PORT=3000
-MONGODB_URI=mongodb://localhost:27017/akram_biology
+3. Update `.env` values:
 
-ADMIN_USERNAME=akram
-ADMIN_PASSWORD=biology@2025    # CHANGE THIS!
+- `MONGO_URI`
+- `SESSION_SECRET`
+- `ADMIN_EMAIL`
+- `ADMIN_PASSWORD`
 
-EMAIL_USER=yourgmail@gmail.com
-EMAIL_PASS=your_app_password   # Gmail App Password (not regular password)
+4. Seed admin user:
 
-WHATSAPP_NUMBER=919876543210   # Your WhatsApp number with country code
-```
-
-### 4. Run the app
 ```bash
-# Development (with auto-restart)
+npm run seed:admin
+```
+
+5. Run app:
+
+```bash
 npm run dev
-
-# Production
-npm start
 ```
 
-### 5. Open in browser
-- **Website:** http://localhost:3000
-- **Admin Panel:** http://localhost:3000/admin/login
+Open:
 
----
+- Public: `http://localhost:5000/`
+- Notes: `http://localhost:5000/notes`
+- Admin Login: `http://localhost:5000/admin/login`
 
-## 🔐 Default Admin Credentials
+## Production Run
+
+```bash
+NODE_ENV=production npm start
 ```
-Username: akram
-Password: biology@2025
-```
-> ⚠️ Change the password in `.env` before going live!
 
----
+## Notes
 
-## 📧 Gmail Email Setup
-1. Go to Google Account → Security → 2-Step Verification (enable it)
-2. Then go to **App Passwords**
-3. Create an app password for "Mail"
-4. Paste that 16-character password as `EMAIL_PASS` in `.env`
-
----
-
-## 🌐 Features
-
-### Public Website
-- ✅ Homepage with hero, about, topics, schedule, testimonials, contact
-- ✅ Enrollment form (saves to MongoDB)
-- ✅ Contact/enquiry form
-- ✅ Dynamic batch listing from database
-- ✅ Floating WhatsApp button
-
-### Admin Panel (`/admin`)
-- ✅ Secure login with bcrypt + sessions
-- ✅ Dashboard with live stats
-- ✅ Students list with search + filter by status/class
-- ✅ Student detail page — update status, fee status, notes
-- ✅ WhatsApp quick-action links
-- ✅ Batch management — add, activate/deactivate, delete
-- ✅ Messages inbox from contact form
-- ✅ Email notifications on new enrollment
-
----
-
-## 🛠 Tech Stack
-| Layer | Technology |
-|-------|-----------|
-| Runtime | Node.js |
-| Framework | Express.js |
-| Database | MongoDB + Mongoose |
-| Templates | EJS |
-| Auth | express-session + bcryptjs |
-| Email | Nodemailer (Gmail) |
-| Styling | Custom CSS (biology green theme) |
-
----
-
-## 📞 Deployment (Free Options)
-- **Railway.app** — Connect GitHub repo, add env vars, deploy in 2 clicks
-- **Render.com** — Free tier, add MongoDB Atlas URI
-- **MongoDB Atlas** — Free 512MB cloud MongoDB
-
----
-
-Made with 🧬 for Akram Biology Tuition, Malda, West Bengal
+- Uploaded files are served from `public/uploads`.
+- In production, put app behind Nginx/Load Balancer and enable HTTPS.
+- Use managed MongoDB backups for safety.

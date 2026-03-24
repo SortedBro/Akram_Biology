@@ -1,0 +1,94 @@
+<%
+  const classTitles = {
+    '9': { h: 'Class IX - Biology Notes', s: 'WBBSE Board Standard' },
+    '10': { h: 'Class X - Biology Notes', s: 'WBBSE Board Standard' },
+    '11': { h: 'Class XI - Biology Notes', s: 'WBCHSE Board Standard' },
+    '12': { h: 'Class XII - Biology Notes', s: 'WBCHSE / NEET Preparation' }
+  };
+  const t = classTitles[selectedClass] || classTitles['11'];
+  const c9 = chapterCountMap['9'] || 0;
+  const c10 = chapterCountMap['10'] || 0;
+  const c11 = chapterCountMap['11'] || 0;
+  const c12 = chapterCountMap['12'] || 0;
+%>
+
+<nav class="nav">
+  <div class="nav-brand">
+    <div class="dna-icon">&#x1F9EC;</div>
+    <span>Akram's Bio-Care</span>
+  </div>
+  <div class="nav-links">
+    <a class="nav-link" href="/"><span class="nl-icon">&#x1F3E0;</span> Home</a>
+    <a class="nav-link active" href="/notes"><span class="nl-icon">&#x1F4DA;</span> Notes</a>
+    <a class="nav-link" href="/#enroll"><span class="nl-icon">&#x270D;&#xFE0F;</span> Enroll</a>
+    <a class="nav-link" href="/#contact"><span class="nl-icon">&#x1F4DE;</span> Contact</a>
+    <div class="nav-sep"></div>
+    <a class="nav-link" href="/admin/login"><span class="nl-icon">&#x1F510;</span> Admin</a>
+  </div>
+</nav>
+
+<div class="notes-wrap">
+  <aside class="notes-sidebar">
+    <div class="nsb-section">
+      <div class="nsb-label">Class</div>
+      <a class="nsb-btn <%= selectedClass === '9' ? 'active' : '' %>" href="/notes?class=9"><span class="nsb-badge nb-9">IX</span> Class IX <span class="nsb-count"><%= c9 %></span></a>
+      <a class="nsb-btn <%= selectedClass === '10' ? 'active' : '' %>" href="/notes?class=10"><span class="nsb-badge nb-10">X</span> Class X <span class="nsb-count"><%= c10 %></span></a>
+      <a class="nsb-btn <%= selectedClass === '11' ? 'active' : '' %>" href="/notes?class=11"><span class="nsb-badge nb-11">XI</span> Class XI <span class="nsb-count"><%= c11 %></span></a>
+      <a class="nsb-btn <%= selectedClass === '12' ? 'active' : '' %>" href="/notes?class=12"><span class="nsb-badge nb-12">XII</span> Class XII <span class="nsb-count"><%= c12 %></span></a>
+    </div>
+
+    <div class="nsb-div"></div>
+
+    <div class="nsb-tips">
+      <div class="nsb-tips-title">Quick Guide</div>
+      <ul>
+        <li>Open any chapter file</li>
+        <li>PDF and image notes available</li>
+        <li>Teacher uploads from admin panel</li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="notes-main">
+    <div class="notes-top">
+      <div class="notes-heading">
+        <h2 id="notesH2"><%= t.h %></h2>
+        <p id="notesP"><%= t.s %></p>
+      </div>
+      <a class="btn btn-outline" href="/admin/login">Teacher Upload Login</a>
+    </div>
+
+    <div class="chapters-grid" id="chapGrid">
+      <% if (!chapters.length) { %>
+        <div class="notes-empty">
+          <div class="ne-icon">&#x1F4DA;</div>
+          <h3>No chapters yet</h3>
+          <p>Notes for this class are not uploaded yet. Please check again later.</p>
+        </div>
+      <% } %>
+
+      <% chapters.forEach((chapter, idx) => { %>
+        <div class="ch-card" style="animation-delay:<%= idx * 0.05 %>s">
+          <div class="ch-top">
+            <span class="ch-tag">Chapter <%= idx + 1 %></span>
+          </div>
+          <div class="ch-title"><%= chapter.title %></div>
+          <div class="ch-files">
+            <% if (!chapter.files.length) { %>
+              <div style="font-size:0.76rem;color:var(--text3);padding:6px 0;font-style:italic">No files uploaded yet</div>
+            <% } %>
+            <% chapter.files.forEach((file) => { %>
+              <a class="file-row" href="<%= file.fileUrl %>" target="_blank" rel="noreferrer">
+                <div class="file-icon-box <%= file.mimeType === 'application/pdf' ? 'fi-pdf' : 'fi-img' %>"><%= file.mimeType === 'application/pdf' ? 'PDF' : 'IMG' %></div>
+                <div class="file-info">
+                  <div class="file-name"><%= file.title %></div>
+                  <div class="file-size"><%= Math.max(1, Math.round(file.sizeInBytes / 1024)) %> KB</div>
+                </div>
+              </a>
+            <% }) %>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </main>
+</div>

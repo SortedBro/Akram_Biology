@@ -1,0 +1,88 @@
+<section class="admin-panel">
+  <div class="panel-head">
+    <h2>Notes Management</h2>
+    <form method="get" action="/admin/dashboard" class="inline-form">
+      <input type="hidden" name="tab" value="notes" />
+      <label>
+        Class
+        <select name="class" onchange="this.form.submit()">
+          <option value="9" <%= selectedNotesClass === '9' ? 'selected' : '' %>>9</option>
+          <option value="10" <%= selectedNotesClass === '10' ? 'selected' : '' %>>10</option>
+          <option value="11" <%= selectedNotesClass === '11' ? 'selected' : '' %>>11</option>
+          <option value="12" <%= selectedNotesClass === '12' ? 'selected' : '' %>>12</option>
+        </select>
+      </label>
+    </form>
+  </div>
+
+  <article class="card">
+    <h3>Create Chapter (Class <%= selectedNotesClass %>)</h3>
+    <form class="grid cols-3 form-grid" method="post" action="/admin/chapters">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      <input type="hidden" name="classLevel" value="<%= selectedNotesClass %>" />
+      <label>
+        Chapter Title *
+        <input type="text" name="title" required />
+      </label>
+      <label>
+        Sort Order
+        <input type="number" name="sortOrder" value="100" />
+      </label>
+      <label>
+        Description
+        <input type="text" name="description" />
+      </label>
+      <div class="full">
+        <button class="btn" type="submit">Add Chapter</button>
+      </div>
+    </form>
+  </article>
+
+  <div class="stack">
+    <% chapters.forEach((chapter) => { %>
+      <article class="card">
+        <div class="space-between">
+          <div>
+            <h3><%= chapter.title %></h3>
+            <p class="muted"><%= chapter.description || 'No description' %></p>
+          </div>
+          <form method="post" action="/admin/chapters/<%= chapter._id %>?_method=DELETE">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <button class="btn btn-danger js-confirm" data-confirm="Delete this chapter?" type="submit">Delete Chapter</button>
+          </form>
+        </div>
+
+        <form method="post" action="/admin/chapters/<%= chapter._id %>/files?_csrf=<%= csrfToken %>" enctype="multipart/form-data" class="grid cols-3 form-grid">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <label>
+            File Title
+            <input type="text" name="fileTitle" />
+          </label>
+          <label>
+            Files (PDF/JPG/PNG/WEBP)
+            <input type="file" name="files" multiple required />
+          </label>
+          <div>
+            <button class="btn" type="submit">Upload Files</button>
+          </div>
+        </form>
+
+        <% if (!chapter.files.length) { %>
+          <p class="muted">No files uploaded yet.</p>
+        <% } else { %>
+          <ul class="file-list">
+            <% chapter.files.forEach((file) => { %>
+              <li>
+                <a href="<%= file.fileUrl %>" target="_blank" rel="noreferrer"><%= file.title %></a>
+                <form method="post" action="/admin/chapters/<%= chapter._id %>/files/<%= file._id %>?_method=DELETE">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                  <button class="btn btn-danger btn-sm js-confirm" data-confirm="Delete this file?" type="submit">Delete</button>
+                </form>
+              </li>
+            <% }) %>
+          </ul>
+        <% } %>
+      </article>
+    <% }) %>
+  </div>
+</section>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <% const isAdminRoute = currentPath && currentPath.startsWith('/admin'); %>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title ? `${title} | ${appName}` : appName %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/public/css/legacy-theme.css" />
+  </head>
+  <body>
+    <% const shouldHideHeader = typeof hideHeader !== 'undefined' ? hideHeader : false; %>
+    <% if (!shouldHideHeader) { %>
+      <%- include('partials/header') %>
+    <% } %>
+
+    <main class="<%= shouldHideHeader ? '' : 'public-shell' %>">
+      <%- include('partials/flash') %>
+      <%- body %>
+    </main>
+
+    <% if (!shouldHideHeader) { %>
+      <%- include('partials/footer') %>
+    <% } %>
+
+    <script src="/public/js/main.js"></script>
+    <script src="/public/js/legacy-theme.js"></script>
+    <% if (isAdminRoute) { %>
+      <script src="/public/js/admin-legacy.js"></script>
+    <% } %>
+  </body>
+</html>

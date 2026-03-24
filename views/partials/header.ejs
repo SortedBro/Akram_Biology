@@ -1,0 +1,18 @@
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="/">
+      <span class="brand-icon">🧬</span>
+      <span class="brand-text"><%= appName %></span>
+    </a>
+
+    <nav class="nav-links">
+      <a href="/" class="<%= currentPath === '/' ? 'active' : '' %>">Home</a>
+      <a href="/notes" class="<%= currentPath === '/notes' ? 'active' : '' %>">Student Notes</a>
+      <% if (currentUser) { %>
+        <a href="/admin/dashboard" class="<%= currentPath.includes('/admin') ? 'active' : '' %>">Teacher Panel</a>
+      <% } else { %>
+        <a href="/admin/login">Teacher Login</a>
+      <% } %>
+    </nav>
+  </div>
+</header>

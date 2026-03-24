@@ -1,91 +1,436 @@
-<%- include('layout-start') %>
+<%
+  const tab = activeTab || 'dashboard';
+  const recentStudents = students.slice(0, 5);
+  const recentMessages = messages.slice(0, 3);
+%>
 
-<div class="topbar">
-  <div class="topbar-title">🌿 Dashboard</div>
-  <div class="topbar-right">
-    <span class="admin-badge">👤 <%= adminName %></span>
-    <a href="/enroll" target="_blank" class="btn btn-green">+ New Student</a>
-  </div>
-</div>
-
-<% if (success && success.length) { %><div class="alert alert-success"><%= success[0] %></div><% } %>
-<% if (error   && error.length)   { %><div class="alert alert-error"  ><%= error[0]   %></div><% } %>
-
-<!-- STATS -->
-<div class="stats-row">
-  <div class="stat-card">
-    <div class="stat-label">Total Students</div>
-    <div class="stat-value green"><%= stats.totalStudents %></div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-label">Pending Enrollments</div>
-    <div class="stat-value yellow"><%= stats.pending %></div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-label">Confirmed Students</div>
-    <div class="stat-value teal"><%= stats.confirmed %></div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-label">Unread Messages</div>
-    <div class="stat-value red"><%= stats.unreadMessages %></div>
-  </div>
-</div>
-
-<!-- BATCHES OVERVIEW -->
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
-  <% batches.forEach(function(b){ %>
-  <div class="form-card" style="padding:20px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <strong style="font-size:0.9rem"><%= b.name %></strong>
-      <span class="badge <%= b.isActive ? 'badge-active':'badge-inactive' %>"><%= b.isActive ? 'Active':'Inactive' %></span>
+<div class="admin-wrap">
+  <aside class="admin-sidebar">
+    <div class="asb-logo">
+      <div class="al-greet">Welcome back,</div>
+      <div class="al-name"><%= currentUser?.fullName || 'Admin' %></div>
     </div>
-    <div style="background:var(--sur2);border-radius:8px;overflow:hidden;height:8px;margin-bottom:8px">
-      <div style="height:100%;width:<%= Math.min((b.currentStudents/b.maxStudents)*100,100) %>%;background:linear-gradient(90deg,#166534,#22c55e);border-radius:8px;transition:width 1s ease"></div>
+
+    <div class="asb-label">Overview</div>
+    <button class="a-nav <%= tab === 'dashboard' ? 'active' : '' %>" data-tab-btn="dashboard"><span class="an-icon">&#x1F4CA;</span> Dashboard</button>
+
+    <div class="asb-label">Manage</div>
+    <button class="a-nav <%= tab === 'students' ? 'active' : '' %>" data-tab-btn="students"><span class="an-icon">&#x1F468;&#x200D;&#x1F393;</span> Students</button>
+    <button class="a-nav <%= tab === 'batches' ? 'active' : '' %>" data-tab-btn="batches"><span class="an-icon">&#x1F4C5;</span> Batches</button>
+    <button class="a-nav <%= tab === 'fees' ? 'active' : '' %>" data-tab-btn="fees"><span class="an-icon">&#x1F4B0;</span> Fees</button>
+    <button class="a-nav <%= tab === 'messages' ? 'active' : '' %>" data-tab-btn="messages">
+      <span class="an-icon">&#x1F4AC;</span> Messages
+      <span class="an-badge" id="msgBadge"><%= stats.unreadMessages %></span>
+    </button>
+    <button class="a-nav <%= tab === 'enrollments' ? 'active' : '' %>" data-tab-btn="enrollments"><span class="an-icon">&#x1F4DD;</span> Enrollments</button>
+
+    <div class="asb-label">Content</div>
+    <a class="a-nav <%= tab === 'notes' ? 'active' : '' %>" href="/admin/dashboard?tab=notes&class=<%= selectedNotesClass %>"><span class="an-icon">&#x1F4DA;</span> Notes Portal</a>
+
+    <div class="asb-label">Account</div>
+    <form method="post" action="/admin/logout">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      <button class="a-nav" type="submit"><span class="an-icon">&#x1F6AA;</span> Logout</button>
+    </form>
+  </aside>
+
+  <main class="admin-main" id="adminMain" data-active-tab="<%= tab %>">
+    <div class="a-tab <%= tab === 'dashboard' ? 'active' : '' %>" id="tab-dashboard" style="<%= tab === 'dashboard' ? 'display:block' : 'display:none' %>">
+      <div class="a-hdr"><h2>&#x1F4CA; Dashboard Overview</h2></div>
+      <div class="dash-stats">
+        <div class="ds-card s1"><div class="ds-num"><%= stats.totalStudents %></div><div class="ds-lbl">Total Students</div></div>
+        <div class="ds-card s2"><div class="ds-num"><%= stats.activeStudents %></div><div class="ds-lbl">Active Students</div></div>
+        <div class="ds-card s3"><div class="ds-num"><%= stats.pendingFees %></div><div class="ds-lbl">Fee Pending</div></div>
+        <div class="ds-card s4"><div class="ds-num"><%= stats.totalBatches %></div><div class="ds-lbl">Total Batches</div></div>
+        <div class="ds-card s5"><div class="ds-num"><%= messages.length %></div><div class="ds-lbl">Messages</div></div>
+      </div>
+      <div class="dash-grid">
+        <div>
+          <div class="a-hdr" style="margin-bottom:12px"><h2 style="font-size:1rem">Recent Students</h2></div>
+          <div class="tbl-box">
+            <table class="dtbl">
+              <thead><tr><th>#</th><th>Name</th><th>Class</th><th>Status</th></tr></thead>
+              <tbody>
+                <% recentStudents.forEach((student, index) => { %>
+                  <tr>
+                    <td><%= index + 1 %></td>
+                    <td class="td-name"><%= student.fullName %></td>
+                    <td>Class <%= student.classLevel %></td>
+                    <td><span class="pill <%= student.status === 'active' ? 'p-active' : 'p-inactive' %>"><%= student.status %></span></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <div class="a-hdr" style="margin-bottom:12px"><h2 style="font-size:1rem">Recent Messages</h2></div>
+          <div class="msg-feed">
+            <% if (!recentMessages.length) { %>
+              <div class="msg-empty">No messages</div>
+            <% } %>
+            <% recentMessages.forEach((message) => { %>
+              <div class="msg-item <%= message.isRead ? '' : 'unread' %>">
+                <div class="msg-top"><span class="msg-sender"><%= message.fullName %></span><span class="msg-phone"><%= message.phone %></span></div>
+                <div class="msg-body"><%= message.message %></div>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+      </div>
     </div>
-    <div style="display:flex;justify-content:space-between;font-size:0.78rem;color:var(--muted)">
-      <span><%= b.currentStudents %>/<%= b.maxStudents %> students</span>
-      <span>₹<%= b.fee %>/mo</span>
+
+    <div class="a-tab <%= tab === 'students' ? 'active' : '' %>" id="tab-students" style="<%= tab === 'students' ? 'display:block' : 'display:none' %>">
+      <div class="a-hdr">
+        <h2>&#x1F468;&#x200D;&#x1F393; Students</h2>
+        <button class="btn btn-violet btn-sm" type="button" onclick="openStudModal()">+ Add Student</button>
+      </div>
+      <div class="tbl-box">
+        <div class="tbl-toolbar">
+          <input class="tbl-search" id="studentSearch" type="text" placeholder="Search by name, class or phone..." />
+        </div>
+        <table class="dtbl">
+          <thead><tr><th>#</th><th>Name</th><th>Class</th><th>Guardian</th><th>Phone</th><th>Address</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="studTbody">
+            <% students.forEach((student, index) => { %>
+              <tr data-student-row>
+                <td><%= index + 1 %></td>
+                <td class="td-name"><%= student.fullName %></td>
+                <td>Class <%= student.classLevel %></td>
+                <td><%= student.guardianName || '-' %></td>
+                <td><%= student.phone %></td>
+                <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><%= student.address || '-' %></td>
+                <td><span class="pill <%= student.status === 'active' ? 'p-active' : 'p-inactive' %>"><%= student.status %></span></td>
+                <td>
+                  <div class="act-btns">
+                    <button
+                      class="act-btn js-edit-student"
+                      type="button"
+                      data-id="<%= student._id %>"
+                      data-full-name="<%= student.fullName %>"
+                      data-guardian-name="<%= student.guardianName || '' %>"
+                      data-class-level="<%= student.classLevel %>"
+                      data-phone="<%= student.phone %>"
+                      data-address="<%= student.address || '' %>"
+                      data-status="<%= student.status %>"
+                      data-board="<%= student.board || '' %>"
+                      data-whatsapp="<%= student.whatsapp || '' %>"
+                      data-email="<%= student.email || '' %>"
+                    >Edit</button>
+                    <form method="post" action="/admin/students/<%= student._id %>?_method=DELETE">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                      <button class="act-btn del js-confirm" data-confirm="Delete this student?" type="submit">Del</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
-  <% }); %>
+
+    <div class="a-tab <%= tab === 'batches' ? 'active' : '' %>" id="tab-batches" style="<%= tab === 'batches' ? 'display:block' : 'display:none' %>">
+      <div class="a-hdr">
+        <h2>&#x1F4C5; Batches</h2>
+        <button class="btn btn-violet btn-sm" type="button" onclick="openBatchModal()">+ Add Batch</button>
+      </div>
+      <div class="batch-grid">
+        <% batches.forEach((batch) => { %>
+          <div class="b-card">
+            <div class="b-cls">Class <%= batch.classLevel %></div>
+            <div class="b-name"><%= batch.name %></div>
+            <div class="b-meta"><%= batch.timing || '-' %></div>
+            <div class="b-meta"><%= batch.days || '-' %></div>
+            <div class="b-meta">Max <%= batch.capacity %> students</div>
+            <div class="b-actions">
+              <button
+                class="btn btn-outline btn-xs js-edit-batch"
+                type="button"
+                data-id="<%= batch._id %>"
+                data-name="<%= batch.name %>"
+                data-class-level="<%= batch.classLevel %>"
+                data-timing="<%= batch.timing || '' %>"
+                data-days="<%= batch.days || '' %>"
+                data-capacity="<%= batch.capacity %>"
+                data-status="<%= batch.status %>"
+              >Edit</button>
+              <form method="post" action="/admin/batches/<%= batch._id %>?_method=DELETE">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                <button class="btn btn-ghost btn-xs js-confirm" data-confirm="Delete this batch?" type="submit" style="color:var(--rose)">Delete</button>
+              </form>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+
+    <div class="a-tab <%= tab === 'fees' ? 'active' : '' %>" id="tab-fees" style="<%= tab === 'fees' ? 'display:block' : 'display:none' %>">
+      <div class="a-hdr">
+        <h2>&#x1F4B0; Fee Management</h2>
+        <button class="btn btn-violet btn-sm" type="button" onclick="openFeeModal()">+ Record Fee</button>
+      </div>
+      <div class="tbl-box">
+        <div class="tbl-toolbar">
+          <input class="tbl-search" id="feeSearch" type="text" placeholder="Search by student..." />
+        </div>
+        <table class="dtbl">
+          <thead><tr><th>#</th><th>Student</th><th>Class</th><th>Month</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="feeTbody">
+            <% fees.forEach((fee, index) => { %>
+              <tr data-fee-row>
+                <td><%= index + 1 %></td>
+                <td class="td-name"><%= fee.student?.fullName || 'Unknown' %></td>
+                <td>Class <%= fee.student?.classLevel || '-' %></td>
+                <td><%= fee.month %></td>
+                <td>Rs <%= fee.amount %></td>
+                <td><span class="pill <%= fee.status === 'paid' ? 'p-active' : 'p-inactive' %>"><%= fee.status %></span></td>
+                <td>
+                  <div class="act-btns">
+                    <button
+                      class="act-btn js-edit-fee"
+                      type="button"
+                      data-id="<%= fee._id %>"
+                      data-student="<%= fee.student?._id || '' %>"
+                      data-month="<%= fee.month %>"
+                      data-amount="<%= fee.amount %>"
+                      data-status="<%= fee.status %>"
+                      data-note="<%= fee.note || '' %>"
+                    >Edit</button>
+                    <form method="post" action="/admin/fees/<%= fee._id %>?_method=DELETE">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                      <button class="act-btn del js-confirm" data-confirm="Delete this fee record?" type="submit">Del</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="a-tab <%= tab === 'messages' ? 'active' : '' %>" id="tab-messages" style="<%= tab === 'messages' ? 'display:block' : 'display:none' %>">
+      <div class="a-hdr">
+        <h2>&#x1F4AC; Contact Messages</h2>
+        <form method="post" action="/admin/messages/read-all?_method=PATCH">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <button class="btn btn-outline btn-sm" type="submit">Mark all read</button>
+        </form>
+      </div>
+      <div class="msg-feed">
+        <% if (!messages.length) { %>
+          <div class="msg-empty">No messages yet</div>
+        <% } %>
+        <% messages.forEach((message) => { %>
+          <div class="msg-item <%= message.isRead ? '' : 'unread' %>">
+            <button class="msg-del"></button>
+            <div class="msg-top">
+              <span class="msg-sender"><%= message.fullName %></span>
+              <span class="msg-phone"><%= message.phone %></span>
+              <span class="msg-time"><%= new Date(message.createdAt).toLocaleString() %></span>
+            </div>
+            <div class="msg-body"><%= message.message %></div>
+            <div class="btn-row" style="margin-top:10px">
+              <% if (!message.isRead) { %>
+                <form method="post" action="/admin/messages/<%= message._id %>/read?_method=PATCH">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                  <button class="btn btn-outline btn-sm" type="submit">Mark Read</button>
+                </form>
+              <% } %>
+              <form method="post" action="/admin/messages/<%= message._id %>?_method=DELETE">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                <button class="btn btn-ghost btn-sm js-confirm" data-confirm="Delete this message?" type="submit" style="color:var(--rose)">Delete</button>
+              </form>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+
+    <div class="a-tab <%= tab === 'enrollments' ? 'active' : '' %>" id="tab-enrollments" style="<%= tab === 'enrollments' ? 'display:block' : 'display:none' %>">
+      <div class="a-hdr"><h2>Enrollment Requests</h2></div>
+      <div class="msg-feed">
+        <% if (!enrollments.length) { %>
+          <div class="msg-empty">No enrollment requests yet</div>
+        <% } %>
+        <% enrollments.forEach((enrollment) => { %>
+          <div class="msg-item">
+            <div class="msg-top">
+              <span class="msg-sender"><%= enrollment.fullName %> (Class <%= enrollment.classLevel %>)</span>
+              <span class="msg-time"><%= new Date(enrollment.createdAt).toLocaleString() %></span>
+            </div>
+            <div class="msg-body">Guardian: <%= enrollment.guardianName %> | Phone: <%= enrollment.phone %></div>
+            <% if (enrollment.message) { %><div class="msg-body"><%= enrollment.message %></div><% } %>
+            <form method="post" action="/admin/enrollments/<%= enrollment._id %>/status?_method=PATCH" class="inline-form" style="margin-top:10px">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+              <select name="status" class="utselt" style="max-width:180px">
+                <option value="new" <%= enrollment.status === 'new' ? 'selected' : '' %>>New</option>
+                <option value="contacted" <%= enrollment.status === 'contacted' ? 'selected' : '' %>>Contacted</option>
+                <option value="converted" <%= enrollment.status === 'converted' ? 'selected' : '' %>>Converted</option>
+                <option value="rejected" <%= enrollment.status === 'rejected' ? 'selected' : '' %>>Rejected</option>
+              </select>
+              <button class="btn btn-violet btn-sm" type="submit">Update</button>
+            </form>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+
+    <div class="a-tab <%= tab === 'notes' ? 'active' : '' %>" id="tab-notes" style="<%= tab === 'notes' ? 'display:block' : 'display:none' %>">
+      <div class="a-hdr">
+        <h2>&#x1F4DA; Notes Portal</h2>
+        <form method="get" action="/admin/dashboard" class="inline-form">
+          <input type="hidden" name="tab" value="notes" />
+          <select class="utselt" name="class" onchange="this.form.submit()">
+            <option value="9" <%= selectedNotesClass === '9' ? 'selected' : '' %>>Class IX</option>
+            <option value="10" <%= selectedNotesClass === '10' ? 'selected' : '' %>>Class X</option>
+            <option value="11" <%= selectedNotesClass === '11' ? 'selected' : '' %>>Class XI</option>
+            <option value="12" <%= selectedNotesClass === '12' ? 'selected' : '' %>>Class XII</option>
+          </select>
+        </form>
+      </div>
+
+      <div class="upload-toolbar">
+        <span class="ut-label">Create chapter:</span>
+        <form method="post" action="/admin/chapters" class="inline-form">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <input type="hidden" name="classLevel" value="<%= selectedNotesClass %>" />
+          <input class="utinp" type="text" name="title" placeholder="Chapter title" required />
+          <input class="utinp" type="text" name="description" placeholder="Description (optional)" />
+          <input class="utinp" type="number" name="sortOrder" value="100" />
+          <button class="btn btn-green btn-sm" type="submit">Add Chapter</button>
+        </form>
+      </div>
+
+      <div class="chapters-grid">
+        <% if (!chapters.length) { %>
+          <div class="notes-empty">
+            <div class="ne-icon">&#x1F4DA;</div>
+            <h3>No chapters yet</h3>
+            <p>Add first chapter and upload notes from here.</p>
+          </div>
+        <% } %>
+
+        <% chapters.forEach((chapter, idx) => { %>
+          <div class="ch-card" style="animation-delay:<%= idx * 0.05 %>s">
+            <div class="ch-top">
+              <span class="ch-tag">Chapter</span>
+              <form method="post" action="/admin/chapters/<%= chapter._id %>?_method=DELETE">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                <button class="ch-del-btn js-confirm" data-confirm="Delete chapter?" type="submit">Del</button>
+              </form>
+            </div>
+            <div class="ch-title"><%= chapter.title %></div>
+            <div class="ch-files">
+              <% chapter.files.forEach((file) => { %>
+                <div class="file-row">
+                  <div class="file-icon-box <%= file.mimeType === 'application/pdf' ? 'fi-pdf' : 'fi-img' %>"><%= file.mimeType === 'application/pdf' ? 'PDF' : 'IMG' %></div>
+                  <div class="file-info">
+                    <div class="file-name"><a href="<%= file.fileUrl %>" target="_blank" rel="noreferrer"><%= file.title %></a></div>
+                    <div class="file-size"><%= Math.max(1, Math.round(file.sizeInBytes / 1024)) %> KB</div>
+                  </div>
+                  <form method="post" action="/admin/chapters/<%= chapter._id %>/files/<%= file._id %>?_method=DELETE">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                    <button class="file-del js-confirm" data-confirm="Delete file?" type="submit">X</button>
+                  </form>
+                </div>
+              <% }) %>
+
+              <form method="post" action="/admin/chapters/<%= chapter._id %>/files?_csrf=<%= csrfToken %>" enctype="multipart/form-data">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                <input class="utinp" type="text" name="fileTitle" placeholder="File label (optional)" />
+                <label class="add-file-label">
+                  <input type="file" name="files" accept=".pdf,image/*" multiple required />
+                  + Add PDF / Image
+                </label>
+                <button class="btn btn-violet btn-sm" type="submit" style="margin-top:8px;width:100%">Upload</button>
+              </form>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+  </main>
 </div>
 
-<!-- RECENT STUDENTS -->
-<div class="table-card">
-  <div class="table-header">
-    <h3>Recent Enrollments</h3>
-    <a href="/admin/students" class="btn btn-green">View All →</a>
+<div class="modal-bg" id="studModal">
+  <div class="modal-box">
+    <div class="modal-top">
+      <div class="modal-title" id="studModalTitle">Add Student</div>
+      <button class="modal-close" type="button" onclick="closeModal('studModal')">X</button>
+    </div>
+    <form id="studForm" method="post" action="/admin/students">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      <div class="modal-row">
+        <input class="modal-inp vi" type="text" id="s-name" name="fullName" placeholder="Full name *" required />
+        <input class="modal-inp vi" type="text" id="s-guardian" name="guardianName" placeholder="Guardian name" />
+      </div>
+      <div class="modal-row">
+        <select class="modal-inp vi" id="s-class" name="classLevel" required><option value="">Select class *</option><option value="9">Class IX</option><option value="10">Class X</option><option value="11">Class XI</option><option value="12">Class XII</option></select>
+        <input class="modal-inp vi" type="tel" id="s-phone" name="phone" placeholder="Phone number *" required />
+      </div>
+      <input class="modal-inp vi" type="text" id="s-board" name="board" placeholder="Board (optional)" />
+      <input class="modal-inp vi" type="text" id="s-whatsapp" name="whatsapp" placeholder="WhatsApp (optional)" />
+      <input class="modal-inp vi" type="email" id="s-email" name="email" placeholder="Email (optional)" />
+      <input class="modal-inp vi" type="text" id="s-address" name="address" placeholder="Address / Village" />
+      <select class="modal-inp vi" id="s-status" name="status"><option value="active">Active</option><option value="inactive">Inactive</option></select>
+      <div class="modal-btns">
+        <button class="btn btn-outline" type="button" onclick="closeModal('studModal')">Cancel</button>
+        <button class="btn btn-violet" type="submit">Save</button>
+      </div>
+    </form>
   </div>
-  <% if (recentStudents.length) { %>
-  <table>
-    <thead>
-      <tr>
-        <th>Student</th>
-        <th>Class</th>
-        <th>Phone</th>
-        <th>Batch</th>
-        <th>Status</th>
-        <th>Enrolled</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% recentStudents.forEach(function(s){ %>
-      <tr>
-        <td><strong><%= s.studentName %></strong><br><span style="font-size:0.76rem;color:var(--muted)"><%= s.parentName || '' %></span></td>
-        <td><%= s.className %></td>
-        <td><a href="tel:<%= s.phone %>" style="color:var(--green3);text-decoration:none"><%= s.phone %></a></td>
-        <td><%= s.batchName || '—' %></td>
-        <td><span class="badge badge-<%= s.status %>"><%= s.status.toUpperCase() %></span></td>
-        <td style="color:var(--muted);font-size:0.8rem"><%= new Date(s.enrolledAt).toLocaleDateString('en-IN') %></td>
-        <td><a href="/admin/students/<%= s._id %>" class="btn btn-green" style="font-size:0.76rem;padding:5px 12px">Manage</a></td>
-      </tr>
-      <% }); %>
-    </tbody>
-  </table>
-  <% } else { %>
-  <div class="empty-state"><div class="emoji">🌱</div><p>No students yet. Share the enrollment link!</p></div>
-  <% } %>
 </div>
 
-<%- include('layout-end') %>
+<div class="modal-bg" id="batchModal">
+  <div class="modal-box">
+    <div class="modal-top">
+      <div class="modal-title">Add / Edit Batch</div>
+      <button class="modal-close" type="button" onclick="closeModal('batchModal')">X</button>
+    </div>
+    <form id="batchForm" method="post" action="/admin/batches">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      <div class="modal-row">
+        <input class="modal-inp vi" type="text" id="b-name" name="name" placeholder="Batch name *" required />
+        <select class="modal-inp vi" id="b-class" name="classLevel" required><option value="">Class *</option><option value="9">Class IX</option><option value="10">Class X</option><option value="11">Class XI</option><option value="12">Class XII</option></select>
+      </div>
+      <input class="modal-inp vi" type="text" id="b-time" name="timing" placeholder="Timing (e.g. 7:00 AM - 8:30 AM)" />
+      <input class="modal-inp vi" type="text" id="b-days" name="days" placeholder="Days (e.g. Mon, Wed, Fri)" />
+      <input class="modal-inp vi" type="number" id="b-capacity" name="capacity" placeholder="Max capacity (e.g. 20)" />
+      <select class="modal-inp vi" id="b-status" name="status"><option value="active">Active</option><option value="paused">Paused</option></select>
+      <div class="modal-btns">
+        <button class="btn btn-outline" type="button" onclick="closeModal('batchModal')">Cancel</button>
+        <button class="btn btn-violet" type="submit">Save Batch</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-bg" id="feeModal">
+  <div class="modal-box">
+    <div class="modal-top">
+      <div class="modal-title">Record Fee</div>
+      <button class="modal-close" type="button" onclick="closeModal('feeModal')">X</button>
+    </div>
+    <form id="feeForm" method="post" action="/admin/fees">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      <select class="modal-inp vi" id="f-student" name="student" required>
+        <option value="">Select student *</option>
+        <% students.forEach((student) => { %>
+          <option value="<%= student._id %>"><%= student.fullName %> (Class <%= student.classLevel %>)</option>
+        <% }) %>
+      </select>
+      <div class="modal-row">
+        <input class="modal-inp vi" type="month" id="f-month" name="month" required />
+        <input class="modal-inp vi" type="number" id="f-amount" name="amount" placeholder="Amount (Rs)" required />
+      </div>
+      <select class="modal-inp vi" id="f-status" name="status"><option value="paid">Paid</option><option value="partial">Partial</option><option value="due">Due</option></select>
+      <input class="modal-inp vi" type="text" id="f-note" name="note" placeholder="Note (optional)" />
+      <div class="modal-btns">
+        <button class="btn btn-outline" type="button" onclick="closeModal('feeModal')">Cancel</button>
+        <button class="btn btn-violet" type="submit">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
